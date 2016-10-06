@@ -1,6 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.views import View
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the home page.")
+class Home(View):
+    template_name = 'home.html'
+
+    def get(self, request):
+        return render(request, self.template_name)
+
+    def post(self, request):
+        pass
