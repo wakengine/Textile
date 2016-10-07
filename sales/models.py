@@ -56,9 +56,11 @@ class Cloth(models.Model):
 
 
 class Ownership(models.Model):
+    number = models.CharField(max_length=10)  # Different shops which owns the same cloth have different number
     shop = models.ForeignKey(Shop)
     cloth = models.ForeignKey(Cloth)
     price = models.FloatField()
+    price_detail = models.CharField(max_length=100)
     image = models.ForeignKey(Image)
     description = models.TextField(max_length=1000)
     created_time = models.DateTimeField(auto_now_add=True)
@@ -85,7 +87,7 @@ class SalesList(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.serial_no + ':' + self.customer.name
+        return self.serial_no + ':' + self.customer.shop_name
 
 
 class SalesDetail(models.Model):
