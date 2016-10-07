@@ -3,6 +3,7 @@
 {% block table_title %} 销售清单 {% endblock %}
 
 {% block content_table %}
+
 {% if sales_list %}
 <thead>
 <tr>
@@ -12,6 +13,7 @@
     <th>颜色</th>
     <th>总量</th>
     <th>总价</th>
+    <th>日期</th>
 </tr>
 </thead>
 <tbody>
@@ -23,14 +25,12 @@
     <td>{{ item.color }}</td>
     <td>{{ item.total_units }}</td>
     <td>{{ item.total_price }}</td>
+    <td>{{ item.order_date }}</td>
 </tr>
 {% endfor %}
 </tbody>
 {% else %}
 <p>No data are available.</p>
 {% endif %}
-
-
-
 
 {% endblock %}
