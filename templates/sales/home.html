@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %} Sales&Stock {% endblock %}
+
+{% block content %}
+  <h2 class="sub-header">销售清单</h2>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>单号</th>
+        <th>顾客</th>
+        <th>品种</th>
+        <th>颜色</th>
+        <th>总量</th>
+        <th>总价</th>
+        <th>日期</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for item in sales_list %}
+        <tr>
+          <td>{{ item.serial_no }}</td>
+          <td>{{ item.customer.shop_name }}</td>
+          <td>{{ item.cloth.name }}</td>
+          <td>{{ item.color }}</td>
+          <td>{{ item.total_units }}</td>
+          <td>{{ item.total_price }}</td>
+          <td>{{ item.order_date }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %} 添加销售数据 {% endblock %}
+
+{% block content %}
+  <h3>录入销售数据</h3>
+  <form action="{% url 'sales:add' %}" method="post">
+    {% csrf_token %}
+    {{ forms.as_p }}
+    <input type="submit" value="Submit">
+
+  </form>
+{% endblock %}

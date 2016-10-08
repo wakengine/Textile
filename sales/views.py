@@ -6,7 +6,7 @@ from .models import SalesList
 
 
 class Home(View):
-    template_name = 'home.html'
+    template_name = 'sales/home.html'
 
     def get(self, request):
         all_list = SalesList.objects.all()
@@ -20,14 +20,14 @@ class Home(View):
 
 
 class AddSaleList(View):
-    template_name = 'add_sale_list.html'
+    template_name = 'sales/add_sale_list.html'
 
     def get(self, request):
         form = SalesListForm
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'forms': form})
 
     def post(self, request):
         sale_list = SalesListForm(request.POST)
         if sale_list.is_valid():
             sale_list.save()
-        return redirect('home')
+        return redirect('sales:show')
