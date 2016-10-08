@@ -14,24 +14,39 @@ class Image(models.Model):
 
 
 class Shop(models.Model):
-    owner_name = models.CharField(max_length=20)
-    shop_name = models.CharField(max_length=20)
-    phone_main = models.CharField(max_length=20)
-    phone_second = models.CharField(max_length=20)
-    phone_third = models.CharField(max_length=20)
-    fax = models.CharField(max_length=20)
-    address = models.CharField(max_length=100)
-    email = models.EmailField()
-    bank_name_main = models.CharField(max_length=20)
-    bank_number_main = models.CharField(max_length=20)
-    bank_name_second = models.CharField(max_length=20)
-    bank_number_second = models.CharField(max_length=20)
-    description = models.TextField(max_length=1000)
+    owner_name = models.CharField(max_length=20, blank=True)
+    shop_name = models.CharField(max_length=20, blank=True)
+    phone_main = models.CharField(max_length=20, blank=True)
+    phone_second = models.CharField(max_length=20, blank=True)
+    phone_third = models.CharField(max_length=20, blank=True)
+    fax = models.CharField(max_length=20, blank=True)
+    address = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    bank_name_main = models.CharField(max_length=20, blank=True)
+    bank_number_main = models.CharField(max_length=20, blank=True)
+    bank_name_second = models.CharField(max_length=20, blank=True)
+    bank_number_second = models.CharField(max_length=20, blank=True)
+    description = models.TextField(max_length=1000, blank=True)
     created_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.owner_name + '@' + self.shop_name
+        if not self.owner_name:
+            return self.shop_name
+        elif not self.shop_name:
+            return self.owner_name
+        else:
+            return self.owner_name + '@' + self.shop_name
+
+    def save(self, *args, **kwargs):
+        if not self.owner_name and not self.shop_name:
+            raise ValueError("Must provide owner name or shop name")
+        super(Shop, self).save(*args, **kwargs)
+
+    def is_valid(self):
+        if not self.owner_name and not self.shop_name:
+            return False
+        return True
 
 
 class Cloth(models.Model):
