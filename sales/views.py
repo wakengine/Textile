@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, Http404
 from django.views import View
 
 from .forms import SalesListForm
@@ -10,8 +10,10 @@ class Home(View):
 
     def get(self, request):
         all_list = SalesList.objects.all()
+        total = SalesList.objects.get_total_price()
         context = {
             'sales_list': all_list,
+            'total': total,
         }
         return render(request, self.template_name, context)
 
@@ -30,4 +32,6 @@ class AddSaleList(View):
         sale_list = SalesListForm(request.POST)
         if sale_list.is_valid():
             sale_list.save()
-        return redirect('sales:show')
+            return redirect('sales:show')
+        else:
+            raise Http404('At least one of the fields is invalid...')
