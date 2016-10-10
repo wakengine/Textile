@@ -1,9 +1,9 @@
 from django.forms import ModelForm
 
-from .models import SalesList
+from .models import Order
 
 
 class SalesListForm(ModelForm):
     class Meta:
-        model = SalesList
+        model = Order
         exclude = ['']

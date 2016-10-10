@@ -2,15 +2,15 @@ from django.shortcuts import render, redirect, Http404
 from django.views import View
 
 from .forms import SalesListForm
-from .models import SalesList
+from .models import Order
 
 
 class Home(View):
     template_name = 'sales/home.html'
 
     def get(self, request):
-        all_list = SalesList.objects.all()
-        total = SalesList.objects.get_total_price()
+        all_list = Order.objects.all()
+        total = Order.objects.get_total_price()
         context = {
             'sales_list': all_list,
             'total': total,

@@ -1,10 +1,9 @@
 from django.contrib import admin
 
-from .models import Shop, Cloth, Image, SalesList, SalesDetail, Ownership
+from .models import *
 
 admin.site.register(Shop)
 admin.site.register(Cloth)
-admin.site.register(Image)
-admin.site.register(SalesList)
-admin.site.register(SalesDetail)
+admin.site.register(Order)
+admin.site.register(OrderDetail)
 admin.site.register(Ownership)
