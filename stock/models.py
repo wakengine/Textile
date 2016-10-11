@@ -1,27 +1,39 @@
 from django.db import models
 
 
-class Shop(models.Model):
-    shop_name = models.CharField(max_length=20, blank=True)
+class Company(models.Model):
+    RelationShip = (
+        ('C', 'Customer'),
+        ('S', 'Supplier'),
+        ('B', 'Both'),
+    )
+
+    name = models.CharField(max_length=20, blank=True)
     owner_name = models.CharField(max_length=20, blank=True)
+    relationship = models.CharField(max_length=1, default='C', choices=RelationShip)
+    phone = models.CharField(max_length=20, blank=True)
+    fax = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+    address = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        if self.owner_name and self.shop_name:
-            return self.owner_name + '@' + self.shop_name
-        elif self.shop_name:
-            return self.shop_name
+        if self.owner_name and self.name:
+            return self.owner_name + '@' + self.name
+        elif self.name:
+            return self.name
         else:
             return self.owner_name
 
     def save(self, *args, **kwargs):
         if not self.is_valid():
             raise ValueError("Must provide owner name or shop name")
-        super(Shop, self).save(*args, **kwargs)
+        super(Company, self).save(*args, **kwargs)
 
     def is_valid(self):
-        if not self.owner_name and not self.shop_name:
+        # Must have either name or owner name.
+        if not self.name and not self.owner_name:
             return False
         return True
 
@@ -30,26 +42,36 @@ class Shop(models.Model):
 
 
 class BankInfo(models.Model):
-    shop = models.ForeignKey(Shop, on_delete=models.PROTECT)
-    owner_name = models.CharField(max_length=20, blank=True)
-    bank_name = models.CharField(max_length=20, blank=True)
-    bank_number = models.CharField(max_length=20, blank=True)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    account_name = models.CharField(max_length=20)
+    bank_name = models.CharField(max_length=20)
+    bank_number = models.CharField(max_length=20)
     timestamp = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.company.get_name()
 
-class ShopContact(models.Model):
-    shop = models.ForeignKey(Shop, on_delete=models.PROTECT)
-    phone_no = models.CharField(max_length=20, blank=True)
-    fax = models.CharField(max_length=20, blank=True)
+
+class CompanyContact(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    contact_person = models.CharField(max_length=10, blank=True)
+    position = models.CharField(max_length=10, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     address = models.CharField(max_length=100, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.company.get_name()
 
-class ShopImage(models.Model):
-    shop = models.ForeignKey(Shop, on_delete=models.PROTECT)
+
+class CompanyImage(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
     img_path = models.CharField(max_length=100, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.company.get_name()
 
 
 class Cloth(models.Model):
@@ -81,48 +103,57 @@ class ClothDetail(models.Model):
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
     timestamp = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.cloth.get_display_name()
+
 
 class ClothImage(models.Model):
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
     img_path = models.CharField(max_length=100, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.cloth.get_display_name()
 
-class Ownership(models.Model):
+
+class ClothInCompany(models.Model):
     """Indicates which shop has which cloth or which cloth can be found in which shop
     It's a Many-to-Many relationship between Shop and Cloth.
     """
-    number = models.CharField(max_length=10, blank=True,
-                              help_text='(Different shops which owns the same cloth have different number)')
-    shop = models.ForeignKey(Shop, on_delete=models.PROTECT)
+    serial_no = models.CharField(max_length=10, blank=True,
+                                 help_text='(Different shops which owns the same cloth have different number)')
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
+    num_of_colors = models.IntegerField(default=0, blank=True)
     price = models.FloatField(default=0, blank=True)
     price_detail = models.CharField(max_length=100, blank=True)
-    img_path = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     created_time = models.DateField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth.name + '@' + self.shop.owner_name
+        return self.cloth.get_display_name() + '@' + self.company.get_name()
 
 
-class OwnershipImage(models.Model):
-    cloth = models.ForeignKey(Ownership, on_delete=models.PROTECT)
+class ClothImageInCompany(models.Model):
+    cloth_in_company = models.ForeignKey(ClothInCompany, on_delete=models.PROTECT)
     img_path = models.CharField(max_length=100, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.cloth_in_company.__str__()
 
 
 class ColorMap(models.Model):
     """Used for mapping two vendor's color for the same cloth
     """
-    ownership = models.ForeignKey(Ownership, on_delete=models.PROTECT)
+    cloth_in_company = models.ForeignKey(ClothInCompany, on_delete=models.PROTECT)
     internal_color = models.CharField(max_length=10)
     external_color = models.CharField(max_length=10)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.ownership.__str__()
+        return self.cloth_in_company.__str__()
 
 
 class StockManager(models.Manager):

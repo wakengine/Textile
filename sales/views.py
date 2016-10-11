@@ -6,7 +6,7 @@ from .models import Order
 
 
 class Home(View):
-    template_name = 'sales/home.html'
+    template_name = 'sales/show_list.html'
 
     def get(self, request):
         all_list = Order.objects.all()
@@ -25,7 +25,7 @@ class AddSaleList(View):
     template_name = 'sales/add_sale_list.html'
 
     def get(self, request):
-        form = SalesListForm
+        form = Order.objects.get_form_data()
         return render(request, self.template_name, {'forms': form})
 
     def post(self, request):

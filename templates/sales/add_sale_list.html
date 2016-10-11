@@ -3,11 +3,14 @@
 {% block title %} 添加销售数据 {% endblock %}
 
 {% block content %}
-  <h3>添加销售数据</h3>
-  <form action="" method="post">
-    {% csrf_token %}
-    {{ forms.as_p }}
-    <input class="btn btn-success" type="submit" value="Submit">
+  <div class="container-fluid">
+    <h1 class="page-header" align="center">添加销售数据</h1>
+    <form class="form-horizontal" action="" method="post">
+      {% csrf_token %}
 
-  </form>
+      {% include 'form_template.html' %}
+
+    </form>
+  </div>
+
 {% endblock %}
