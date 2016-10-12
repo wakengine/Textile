@@ -3,6 +3,7 @@ from django.views import View
 
 from common import utils
 from .models import Order
+from stock.models import *
 
 
 class Home(View):
@@ -40,10 +41,17 @@ class AddSaleList(View):
         total_units = float(utils.get_post_data(request, 'total_units'))
         total_bundles = float(utils.get_post_data(request, 'total_bundles'))
         order_date = utils.get_post_data(request, 'order_date')
-        is_paid = utils.get_post_data(request, 'is_paid')
+        is_not_paid = utils.get_post_data(request, 'is_not_paid')
         is_withdrawn = utils.get_post_data(request, 'is_withdrawn')
         is_warehouse = utils.get_post_data(request, 'is_warehouse')
         description = utils.get_post_data(request, 'description')
+
+        new_cloth = Cloth()
+        new_cloth.serial_no = cloth
+        new_cloth.name = cloth
+        new_cloth.save()
+        if not cloth_id:
+            cloth_id = new_cloth.pk
 
         order = Order()
         order.serial_no = serial_no
@@ -55,6 +63,9 @@ class AddSaleList(View):
         order.total_price = price_per_unit * total_units
         order.total_bundles = total_bundles
         order.order_date = order_date
+        order.is_not_paid = True if is_not_paid else False
+        order.is_withdrawn = True if is_withdrawn else False
+        order.is_warehouse = True if is_warehouse else False
         order.description = description
 
         order.save()

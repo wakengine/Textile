@@ -23,9 +23,9 @@ class Order(models.Model):
     total_units = models.FloatField(verbose_name='总米数/重量', help_text='(单位为m或kg)')
     total_bundles = models.FloatField(default=0, blank=True, verbose_name='总匹数')
     total_price = models.FloatField(verbose_name='总价')
-    is_paid = models.BooleanField(default=True, blank=True, verbose_name='是否付清')
-    is_withdrawn = models.BooleanField(default=False, verbose_name='是否为退单')
-    is_warehouse = models.BooleanField(default=False, verbose_name='是否为仓库')
+    is_not_paid = models.BooleanField(default=False, verbose_name='欠款')
+    is_withdrawn = models.BooleanField(default=False, verbose_name='退单')
+    is_warehouse = models.BooleanField(default=False, verbose_name='仓库')
     description = models.TextField(max_length=1000, blank=True, verbose_name='详细描述')
     order_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False, verbose_name='下单日期')
     timestamp = models.DateTimeField(auto_now=True)
@@ -52,9 +52,9 @@ class Order(models.Model):
                      FormData('总米数/重量', 'total_units', True, 'number', 100000, '0.0', None),
                      FormData('总匹数', 'total_bundles', True, 'number', 1000, '0.0', None),
                      FormData('下单日期', 'order_date', True, 'date', 0, '', None),
-                     FormData('是否付清', 'is_paid', False, 'checkbox', 0, '', None),
-                     FormData('是否为退单', 'is_withdrawn', False, 'checkbox', 0, '', None),
-                     FormData('是否为仓库', 'is_warehouse', False, 'checkbox', 0, '', None),
+                     FormData('欠款', 'is_not_paid', False, 'checkbox', 0, '', None),
+                     FormData('退单', 'is_withdrawn', False, 'checkbox', 0, '', None),
+                     FormData('仓库', 'is_warehouse', False, 'checkbox', 0, '', None),
                      FormData('详细描述', 'description', False, 'textarea', 1000, '添加详细描述', None),
                      ]
 
