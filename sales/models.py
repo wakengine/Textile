@@ -5,15 +5,6 @@ from stock.models import Company, Cloth
 
 
 class OrderManager(models.Manager):
-    def get_form_data(self):
-        form_list = [FormData('单号', 'serial_no', 'required', 'text', '20', '单号', None),
-                     FormData('颜色', 'color', 'required', 'text', '20', '色号', None),
-                     FormData('单价', 'price_per_unit', 'required', 'number', '', '0.0', None),
-                     FormData('下单日期', 'order_date', 'required', 'date', '20', '0.0', None),
-                     ]
-
-        return form_list
-
     def get_total_price(self):
         total_price = 0
         all_list = self.all()
@@ -29,16 +20,45 @@ class Order(models.Model):
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT, verbose_name='布料')
     color = models.CharField(max_length=20, verbose_name='颜色')
     price_per_unit = models.FloatField(verbose_name='单价')
-    total_units = models.FloatField(verbose_name='总米数/克重', help_text='(单位为m或kg)')
+    total_units = models.FloatField(verbose_name='总米数/重量', help_text='(单位为m或kg)')
     total_bundles = models.FloatField(default=0, blank=True, verbose_name='总匹数')
     total_price = models.FloatField(verbose_name='总价')
-    total_paid = models.FloatField(default=0, blank=True, verbose_name='已付金额')
+    is_paid = models.BooleanField(default=True, blank=True, verbose_name='是否付清')
     is_withdrawn = models.BooleanField(default=False, verbose_name='是否为退单')
     is_warehouse = models.BooleanField(default=False, verbose_name='是否为仓库')
+    description = models.TextField(max_length=1000, blank=True, verbose_name='详细描述')
     order_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False, verbose_name='下单日期')
     timestamp = models.DateTimeField(auto_now=True)
 
     objects = OrderManager()
+
+    @staticmethod
+    def get_form_data():
+        customer_list = Company.objects.all()
+        customers = []
+        for customer in customer_list:
+            customers.append('{}__{}'.format(customer.get_name(), customer.pk))
+
+        cloth_list = Cloth.objects.all()
+        clothes = []
+        for cloth in cloth_list:
+            clothes.append('{}__{}'.format(cloth.get_name(), cloth.pk))
+
+        form_list = [FormData('单号', 'serial_no', True, 'text', 20, '单号', None),
+                     FormData('客户', 'customer', True, 'datalist', 0, '', customers),
+                     FormData('布料', 'cloth', True, 'datalist', 0, '', clothes),
+                     FormData('颜色', 'color', True, 'text', 20, '色号', None),
+                     FormData('单价', 'price_per_unit', True, 'number', 1000, '0.0', None),
+                     FormData('总米数/重量', 'total_units', True, 'number', 100000, '0.0', None),
+                     FormData('总匹数', 'total_bundles', True, 'number', 1000, '0.0', None),
+                     FormData('下单日期', 'order_date', True, 'date', 0, '', None),
+                     FormData('是否付清', 'is_paid', False, 'checkbox', 0, '', None),
+                     FormData('是否为退单', 'is_withdrawn', False, 'checkbox', 0, '', None),
+                     FormData('是否为仓库', 'is_warehouse', False, 'checkbox', 0, '', None),
+                     FormData('详细描述', 'description', False, 'textarea', 1000, '添加详细描述', None),
+                     ]
+
+        return form_list
 
     def __str__(self):
         return self.serial_no + ':' + self.customer.get_name()

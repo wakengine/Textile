@@ -1,79 +1,40 @@
-<form class="form-horizontal">
-  {% for item in forms %}
-    <div class="form-group">
-
-      <label class="control-label col-sm-1" for="name">{{ item.label }}:</label>
-      <div class="col-sm-2">
-        <input class="form-control" type={{ item.input_type }}  name={{ item.name }}
-               {% if item.place_holder %}placeholder={{ item.place_holder }}{% endif %}
-                   {% if item.required %}required{% endif %}>
+{% for field in form_data %}
+  <div class="form-group">
+    {% if field.input_type == 'checkbox' %}
+      <div class="col-sm-offset-1 col-sm-2">
+        <div class="checkbox">
+          <label class="control-label">
+            <input type="checkbox"
+                   name={{ field.name }} value="true">{{ field.get_label | safe }}
+          </label>
+        </div>
       </div>
-    </div>
-  {% endfor %}
-  <div class="form-group">
-    <div class="col-sm-offset-1 col-sm-2">
-      <input class="btn btn-info btn-block" type="submit" value="提交">
-    </div>
+    {% elif field.input_type == 'datalist' %}
+      <label class="control-label col-sm-1">{{ field.get_label | safe }}</label>
+      <div class="col-sm-2">
+        <input list="{{ field.name }}_list" class="form-control" name={{ field.name }} {{ field.get_placeholder }}>
+        <datalist id="{{ field.name }}_list">
+          {% for customer in field.options %}
+            <option value={{ customer }}>
+          {% endfor %}
+        </datalist>
+      </div>
+    {% elif field.input_type == 'textarea' %}
+      <label class="control-label col-sm-1">{{ field.get_label | safe }}</label>
+      <div class="col-sm-6">
+          <textarea class="form-control" rows="8"
+                    name={{ field.name }} {{ field.get_placeholder }} {{ field.get_required }} {{ field.get_max_length }}></textarea>
+      </div>
+    {% else %}
+      <label class="control-label col-sm-1" for=id_{{ field.name }}>{{ field.get_label | safe }}</label>
+      <div class="col-sm-2">
+        <input class="form-control" type={{ field.input_type }} id=id_{{ field.name }} name={{ field.name }}
+            {{ field.get_placeholder }}
+            {{ field.get_required }}
+            {{ field.get_max_length }}
+        >
+      </div>
+    {% endif %}
   </div>
-</form>
+{% endfor %}
 
-<h1>Demo:</h1>
-<form class="form-horizontal">
-  <div class="form-group">
-    <label class="control-label col-sm-1" for="name">Name</label>
-    <div class="col-sm-2">
-      <input type="text" class="form-control" id="name" placeholder="Enter name" required>
-      <p class="help">This is your email</p>
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="control-label col-sm-1" for="email">Email:</label>
-    <div class="col-sm-2">
-      <input type="email" class="form-control" id="email" placeholder="Enter email">
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="control-label col-sm-1">Age:</label>
-    <div class="col-sm-2">
-      <input type="number" step="any" class="form-control" placeholder="0.0" required>
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="control-label col-sm-1">Birth Date:</label>
-    <div class="col-sm-2">
-      <input type="date" class="form-control">
-    </div>
-  </div>
-  <div class="form-group">
-    <label class="control-label col-sm-1">Browser:</label>
-    <div class="col-sm-2">
-      <input list="browsers" class="form-control" name="browser">
-      <datalist id="browsers">
-        <option value="中文1">
-        <option value="中文2">
-        <option value="Opera2">
-        <option value="Safari">
-      </datalist>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label class="control-label col-sm-1">Comments:</label>
-    <div class="col-sm-6">
-      <textarea class="form-control" rows="8" id="comment" placeholder="Add comments"></textarea>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <div class="col-sm-offset-1 col-sm-3">
-      <input class="btn btn-info btn-block" type="submit" value="提交">
-    </div>
-  </div>
-</form>
-
-
-<form action="" oninput="x.value=parseInt(a.value)+parseInt(b.value)">
-  <input type="range" id="a" name="a" value="50">
-  <input type="number" id="b" name="b" value="50">
-  <output name="x" for="a b"></output>
-</form>

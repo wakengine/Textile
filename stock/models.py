@@ -81,7 +81,7 @@ class Cloth(models.Model):
     texture = models.CharField(max_length=20, blank=True, verbose_name='纹理')
     width = models.FloatField(default=150, blank=True, verbose_name='幅宽')
     ref_price = models.FloatField(default=0, blank=True, verbose_name='推荐价格')
-    is_per_meter = models.BooleanField(default=True, verbose_name='单位')
+    is_per_meter = models.BooleanField(default=True, verbose_name='是否为长度')
     used_for = models.CharField(max_length=100, blank=True, verbose_name='用途')
     description = models.TextField(max_length=1000, blank=True, verbose_name='详细描述')
     created_time = models.DateTimeField(auto_now_add=True)
@@ -95,7 +95,7 @@ class Cloth(models.Model):
         else:
             return self.name
 
-    def get_display_name(self):
+    def get_name(self):
         return self.__str__()
 
 
@@ -104,7 +104,7 @@ class ClothDetail(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth.get_display_name()
+        return self.cloth.get_name()
 
 
 class ClothImage(models.Model):
@@ -113,7 +113,7 @@ class ClothImage(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth.get_display_name()
+        return self.cloth.get_name()
 
 
 class ClothInCompany(models.Model):
@@ -132,7 +132,7 @@ class ClothInCompany(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth.get_display_name() + '@' + self.company.get_name()
+        return self.cloth.get_name() + '@' + self.company.get_name()
 
 
 class ClothImageInCompany(models.Model):
@@ -174,7 +174,7 @@ class WholeSale(models.Model):
     objects = StockManager()
 
     def __str__(self):
-        return self.cloth.get_display_name()
+        return self.cloth.get_name()
 
 
 class Retail(models.Model):
