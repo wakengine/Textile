@@ -1,5 +1,7 @@
 from django.db import models
 
+from common.form_data import FormData
+
 
 class Company(models.Model):
     RelationShip = (
@@ -17,6 +19,17 @@ class Company(models.Model):
     address = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_form_data():
+        form_list = [FormData('公司名字', 'name', True, 'text', 20, '公司名字', None),
+                     FormData('所有者', 'owner_name', True, 'text', 20, '所有者', None),
+                     FormData('关系', 'relationship', False, 'checkbox', 0, '', None),
+                     FormData('电话', 'phone', False, 'text', 20, '电话', None),
+                     FormData('详细信息', 'description', False, 'textarea', 1000, '添加详细信息', None),
+                     ]
+
+        return form_list
 
     def __str__(self):
         if self.owner_name and self.name:
@@ -86,6 +99,16 @@ class Cloth(models.Model):
     description = models.TextField(max_length=1000, blank=True, verbose_name='详细描述')
     created_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_form_data():
+        form_list = [FormData('编号', 'serial_no', True, 'text', 20, '编号', None),
+                     FormData('名称', 'name', True, 'text', 20, '名称', None),
+                     FormData('材质', 'material', False, 'text', 20, '材质', None),
+                     FormData('详细信息', 'description', False, 'textarea', 1000, '添加详细信息', None),
+                     ]
+
+        return form_list
 
     def __str__(self):
         if self.serial_no and self.name:

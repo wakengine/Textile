@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} 添加客户 {% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <h1 class="page-header" align="center"><span class="text-primary">添加客户</span></h1>
+
+    <form class="form-horizontal" action="" method="post">
+      {% csrf_token %}
+
+      {% include 'form_template.html' %}
+
+      <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-2">
+          <input class="btn btn-info btn-block" type="submit" value="提交">
+        </div>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}
