@@ -15,7 +15,7 @@ class OrderManager(models.Manager):
 
 class Order(models.Model):
     serial_no = models.CharField(max_length=20, verbose_name='单号', help_text='(所在单号)')
-    order_id = models.CharField(max_length=20, verbose_name='订单编号')
+    internal_id = models.CharField(max_length=20, verbose_name='订单编号')
     customer = models.ForeignKey(Company, on_delete=models.PROTECT, verbose_name='顾客')
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT, verbose_name='布料')
     color = models.CharField(max_length=20, verbose_name='颜色')

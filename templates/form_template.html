@@ -15,7 +15,7 @@
         <input list="{{ field.name }}_list" class="form-control" name={{ field.name }} {{ field.get_placeholder }}>
         <datalist id="{{ field.name }}_list">
           {% for customer in field.options %}
-            <option value={{ customer }}>
+            <option value="{{ customer | safe }}">
           {% endfor %}
         </datalist>
       </div>

@@ -14,6 +14,8 @@
         <th>颜色</th>
         <th>总量</th>
         <th>总价</th>
+        <th>欠款</th>
+        <th>退单</th>
         <th>日期</th>
       </tr>
       </thead>
@@ -26,6 +28,8 @@
           <td>{{ order.color }}</td>
           <td>{{ order.total_units }}</td>
           <td>{{ order.total_price }}</td>
+          <td>{% if order.is_not_paid %}是{% endif %}</td>
+          <td>{% if order.is_withdrawn %}是{% endif %}</td>
           <td>{{ order.order_date }}</td>
         </tr>
       {% empty %}
