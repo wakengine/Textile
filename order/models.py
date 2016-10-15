@@ -25,6 +25,7 @@ class OrderManager(models.Manager):
                      FormData('颜色', 'color', True, 'text', 20, '色号', None),
                      FormData('单价', 'price_per_unit', True, 'number', 1000, '0.0', None),
                      FormData('总米数/重量', 'total_units', True, 'number', 100000, '0.0', None),
+                     FormData('总价', 'total_price', True, 'autogen', 0, '0.0', None),
                      FormData('总匹数', 'total_bundles', True, 'number', 1000, '0.0', None),
                      FormData('下单日期', 'order_date', True, 'date', 0, '', None),
                      FormData('欠款', 'is_not_paid', False, 'checkbox', 0, '', None),
@@ -52,6 +53,9 @@ class OrderManager(models.Manager):
         is_withdrawn = form.get_post_data('is_withdrawn')
         is_warehouse = form.get_post_data('is_warehouse')
         description = form.get_post_data('description')
+
+        if Order.objects.get(serial_no=serial_no):
+            return None
 
         _, _, customer_id = customer.partition(OrderManager.ID_PREFIX)
         if not customer_id:
@@ -86,8 +90,19 @@ class OrderManager(models.Manager):
         order.is_withdrawn = True if is_withdrawn else False
         order.is_warehouse = True if is_warehouse else False
         order.description = description
-
         order.save()
+
+        for detail_row in '12345':
+            for detail_col in '1234':
+                detail_data = form.get_post_data('order_details_{}_{}'.format(detail_row, detail_col))
+                if not detail_data:
+                    continue
+                detail_meter = float(detail_data)
+                detail_obj = OrderDetail()
+                detail_obj.order_id = order.pk
+                detail_obj.meter = detail_meter
+                detail_obj.save()
+
         return order
 
     def get_total_price(self):

@@ -28,7 +28,9 @@ class CreateOrder(View):
         return render(request, self.template_name, {'form_data': form})
 
     def post(self, request):
-        OrderManager.read_and_save_order(request)
+        order = OrderManager.read_and_save_order(request)
+        if not order:
+            raise Http404('TODO: cannot add the order with same serial id again.')
 
         return redirect('order:show')
         raise Http404('At least one of the fields is invalid...')

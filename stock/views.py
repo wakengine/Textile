@@ -1,14 +1,14 @@
 from django.shortcuts import render, Http404
 from django.views import View
 
-from stock.models import Company, Cloth
+from stock.models import CompanyManager, Cloth
 
 
 class AddCompany(View):
     template_name = 'stock/add_company.html'
 
     def get(self, request):
-        form = Company.get_form_data()
+        form = CompanyManager.get_form_data()
         return render(request, self.template_name, {'form_data': form})
 
     def post(self, request):

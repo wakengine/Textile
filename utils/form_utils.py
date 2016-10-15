@@ -35,6 +35,9 @@ class FormData:
             return 'placeholder={}'.format(self.place_holder)
         return ''
 
+    def get_placeholder_content(self):
+        return self.place_holder
+
     def get_max_length(self):
         if self.max_length > 0:
             if self.input_type == 'number':

@@ -4,15 +4,15 @@
       <label class="control-label col-sm-1" style="min-width: 120px"
              for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
       <div class="col-sm-2" style="min-width: 240px">
-          <input class="checkbox" type="checkbox" style="min-width: 16px" id="id_{{ field.name }}"
-                 name="{{ field.name }}">
+        <input class="checkbox" type="checkbox" style="min-width: 16px" id="id_{{ field.name }}"
+               name="{{ field.name }}">
       </div>
     {% elif field.input_type == 'datalist' %}
       <label class="control-label col-sm-1" style="min-width: 120px"
              for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
       <div class="col-sm-2" style="min-width: 240px">
-          <input list="{{ field.name }}_list" class="form-control" id="id_{{ field.name }}"
-                 name="{{ field.name }}" {{ field.get_placeholder }}>
+        <input list="{{ field.name }}_list" class="form-control" id="id_{{ field.name }}"
+               name="{{ field.name }}" {{ field.get_placeholder }}>
         <datalist id="{{ field.name }}_list">
           {% for customer in field.options %}
             <option value="{{ customer }}">
@@ -25,14 +25,21 @@
       <div class="col-sm-6" style="min-width: 360px">
           <textarea class="form-control" rows="9" id="id_{{ field.name }}"
                     name="{{ field.name }}" {{ field.get_placeholder }} {{ field.get_required }}
-                    {{ field.get_max_length }}></textarea>
+              {{ field.get_max_length }}></textarea>
+      </div>
+    {% elif field.input_type == 'autogen' %}
+      <label class="control-label col-sm-1" style="min-width: 120px"
+             for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
+      <div class="col-sm-2" style="min-width: 240px">
+        <p class="form-control" id="id_{{ field.name }}"><span
+            class="text-muted">{{ field.get_placeholder_content }}</span></p>
       </div>
     {% else %}
       <label class="control-label col-sm-1 " style="min-width: 120px"
              for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
       <div class="col-sm-2" style="min-width: 240px">
-          <input class="form-control" type="{{ field.input_type }}" id="id_{{ field.name }}"
-                 name="{{ field.name }}"
+        <input class="form-control" type="{{ field.input_type }}" id="id_{{ field.name }}"
+               name="{{ field.name }}"
             {{ field.get_placeholder }}
             {{ field.get_required }}
             {{ field.get_max_length }}
