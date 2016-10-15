@@ -1,6 +1,6 @@
 from django.db import models
 
-from common.form_data import FormData
+from utils.form_utils import FormData
 
 
 class Company(models.Model):
@@ -24,8 +24,8 @@ class Company(models.Model):
     def get_form_data():
         form_list = [FormData('公司名字', 'name', True, 'text', 20, '公司名字', None),
                      FormData('所有者', 'owner_name', True, 'text', 20, '所有者', None),
-                     FormData('关系', 'relationship', False, 'checkbox', 0, '', None),
                      FormData('电话', 'phone', False, 'text', 20, '电话', None),
+                     FormData('关系', 'relationship', False, 'checkbox', 0, '', None),
                      FormData('详细信息', 'description', False, 'textarea', 1000, '添加详细信息', None),
                      ]
 

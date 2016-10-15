@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %} 添加销售数据 {% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="page-header" align="center"><span class="text-primary">添加销售数据</span></h1>
+
+    <form class="form-horizontal" action="" method="post">
+        {% csrf_token %}
+
+        {% include 'form_template.html' %}
+
+        <div class="form-group">
+            <label class="control-label col-sm-1" style="min-width: 120px"></label>
+            <div class="col-sm-2" style="min-width: 240px">
+                <input class="btn btn-info btn-block" type="submit" value="提交">
+            </div>
+        </div>
+
+        <h4 class="page-header"><span class="text-primary">添加详细数据</span></h4>
+        <div class="form-group">
+            <label class="control-label col-sm-1" style="min-width: 120px"></label>
+            <div class="col-sm-2" style="min-width: 240px">
+                <input class="btn btn-info btn-block" type="submit" value="提交">
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

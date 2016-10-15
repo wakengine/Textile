@@ -22,8 +22,8 @@ class FormData:
 
     def get_label(self):
         if self.required:
-            return '<span class="text-primary bg-info">{}:</span>'.format(self.label)
-        return '<span class="text-muted">{}:</span>'.format(self.label)
+            return '<span class="text-primary bg-info">{}</span>'.format(self.label)
+        return '<span class="text-muted">{}</span>'.format(self.label)
 
     def get_required(self):
         if self.required:
@@ -42,3 +42,16 @@ class FormData:
             else:
                 return 'maxlength={}'.format(self.max_length)
         return ''
+
+
+class FormReader:
+    request = None
+
+    def __init__(self, request):
+        self.request = request
+
+    def get_post_data(self, name):
+        if name in self.request.POST:
+            return self.request.POST[name]
+        else:
+            return None

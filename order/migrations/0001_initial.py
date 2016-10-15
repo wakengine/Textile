@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -43,7 +42,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('meter', models.FloatField(verbose_name='米数')),
                 ('timestamp', models.DateTimeField(auto_now=True)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='sales.Order', verbose_name='所属订单')),
+                ('order',
+                 models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='order.Order', verbose_name='所属订单')),
             ],
         ),
         migrations.CreateModel(
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('img_path', models.CharField(blank=True, max_length=100)),
                 ('timestamp', models.DateTimeField(auto_now=True)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='sales.Order')),
+                ('order', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='order.Order')),
             ],
         ),
     ]
