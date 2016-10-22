@@ -23,7 +23,7 @@ class Company(models.Model):
         ('B', 'Both'),
     )
 
-    name = models.CharField(max_length=20, blank=True)
+    name = models.CharField(max_length=20)
     owner_name = models.CharField(max_length=20, blank=True)
     relationship = models.CharField(max_length=1, default='C', choices=RelationShip)
     phone = models.CharField(max_length=20, blank=True)

@@ -1,15 +1,17 @@
 from django.shortcuts import render
 from django.views import View
 
-from .models import CompanyManager, Cloth
+from .forms import CompanyForm
+from .models import Cloth
 
 
 class AddCompany(View):
     template_name = 'asset/add_company.html'
 
     def get(self, request):
-        form = CompanyManager.get_form_data()
-        return render(request, self.template_name, {'form_data': form})
+        # form = CompanyManager.get_form_data()
+        form = CompanyForm()
+        return render(request, 'asset/add_test.html', {'form_data': form})
 
     def post(self, request):
         return
