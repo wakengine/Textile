@@ -38,8 +38,8 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li><a href="{% url 'order:add' %}">添加销售数据</a></li>
-        <li><a href="{% url 'stock:add_cloth' %}">添加布料</a></li>
-        <li><a href="{% url 'stock:add_company' %}">添加客户</a></li>
+        <li><a href="{% url 'asset:add_cloth' %}">添加布料</a></li>
+        <li><a href="{% url 'asset:add_company' %}">添加客户</a></li>
         <li><a href="/admin">管理</a></li>
       </ul>
       <form class="navbar-form navbar-right" action="{% url 'order:show' %}" method="get">
@@ -60,8 +60,8 @@
       </ul>
       <ul class="nav nav-sidebar">
         <li><a href="{% url 'order:add' %}">添加销售数据</a></li>
-        <li><a href="{% url 'stock:add_cloth' %}">添加布料</a></li>
-        <li><a href="{% url 'stock:add_company' %}">添加客户</a></li>
+        <li><a href="{% url 'asset:add_cloth' %}">添加布料</a></li>
+        <li><a href="{% url 'asset:add_company' %}">添加客户</a></li>
       </ul>
       <ul class="nav nav-sidebar">
         <li><a href="#">关于</a></li>

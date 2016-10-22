@@ -17,9 +17,12 @@ from django.conf.urls import include, url
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^asset/', include('asset.urls')),
     url(r'^order/', include('order.urls')),
     url(r'^stock/', include('stock.urls')),
     url(r'^report/', include('report.urls')),
+
+    url(r'^admin/', admin.site.urls),
+
     url(r'^', include('order.urls')),
 ]

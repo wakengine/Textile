@@ -1,6 +1,6 @@
 from django.db import models
 
-from stock.models import Company, Cloth
+from asset.models import Company, Cloth
 from utils.form_utils import FormData, FormReader
 
 
@@ -54,8 +54,11 @@ class OrderManager(models.Manager):
         is_warehouse = form.get_post_data('is_warehouse')
         description = form.get_post_data('description')
 
-        if Order.objects.get(serial_no=serial_no):
+        try:
+            Order.objects.get(serial_no=serial_no)
             return None
+        except Order.DoesNotExist:
+            pass
 
         _, _, customer_id = customer.partition(OrderManager.ID_PREFIX)
         if not customer_id:
