@@ -5,7 +5,7 @@ from .models import Order, OrderManager
 
 
 class ShowOrders(View):
-    template_name = 'order/show_list.html'
+    template_name = 'order/order_list.html'
 
     def get(self, request):
         all_list = Order.objects.all()
@@ -21,7 +21,7 @@ class ShowOrders(View):
 
 
 class CreateOrder(View):
-    template_name = 'order/create_order.html'
+    template_name = 'order/order_add.html'
 
     def get(self, request):
         form = OrderManager.get_form_data()

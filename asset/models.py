@@ -5,15 +5,17 @@ from utils.form_utils import FormData
 
 class CompanyManager(models.Manager):
     @staticmethod
-    def get_form_data():
-        form_list = [FormData('公司名字', 'name', True, 'text', 20, '公司名字', None),
-                     FormData('所有者', 'owner_name', True, 'text', 20, '所有者', None),
-                     FormData('电话', 'phone', False, 'text', 20, '电话', None),
-                     FormData('关系', 'relationship', False, 'checkbox', 0, '', None),
-                     FormData('详细信息', 'description', False, 'textarea', 1000, '添加详细信息', None),
-                     ]
-
-        return form_list
+    def create_company_from_form_data(form):
+        """Create an instance of Company from form data
+        :param form: Form data posted by user
+        :return: An instance of Company
+        """
+        company = Company()
+        company.name = form['name']
+        company.owner_name = form['owner_name']
+        company.relationship = form['relationship']
+        company.description = form['description']
+        return company
 
 
 class Company(models.Model):

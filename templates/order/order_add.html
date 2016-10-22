@@ -5,7 +5,7 @@
 {% block content %}
   <script>
     function get_total_price(units, price) {
-      document.getElementById('id_total_price').innerHTML = '' + units * price;
+      document.getElementById('id_total_price').innerHTML = '' + (units * price).toFixed(1);
     }
     function set_current_date(id) {
       document.getElementById(id).value = moment().format('YYYY-MM-DD');
@@ -16,8 +16,9 @@
     <h1 class="page-header" align="center"><span class="text-primary">添加销售数据</span></h1>
 
     <form class="form-horizontal" action="" method="post"
-          onchange="get_total_price(document.getElementById('id_price_per_unit').value,
-          document.getElementById('id_total_units').value)">
+          onchange="get_total_price(
+              document.getElementById('id_price_per_unit').value,
+              document.getElementById('id_total_units').value)">
 
       {% csrf_token %}
 
