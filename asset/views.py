@@ -10,9 +10,8 @@ class AddCompany(View):
     template_name = 'asset/company_add.html'
 
     def get(self, request):
-        # form = CompanyManager.get_form_data()
         form = CompanyForm()
-        return render(request, self.template_name, {'form_data': form})
+        return render(request, self.template_name, {'form_fields': form})
 
     def post(self, request):
         form = CompanyForm(request.POST)

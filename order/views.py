@@ -1,19 +1,7 @@
 from django.shortcuts import render, redirect, Http404
 from django.views import View
 
-from forms import FormForm
 from .models import Order, OrderManager
-
-
-def country_form(request):
-    # instead of hardcoding a list you could make a query of a model, as long as
-    # it has a __str__() method you should be able to display it.
-    country_list = ('Mexico', 'USA', 'China', 'France')
-    form = FormForm(data_list=country_list)
-
-    return render(request, 'my_app/country-form.html', {
-        'form': form
-    })
 
 
 class ShowOrders(View):
