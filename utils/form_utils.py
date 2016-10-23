@@ -1,50 +1,5 @@
-class FormData:
-    label = ''
-    input_type = ''
-    name = ''
-    required = True
-    max_length = 0
-    place_holder = ''
-    help_text = ''
-    options = []
-
-    def __init__(self, label, name, required, input_type, max_length, place_holder, options):
-        self.label = label
-        self.name = name
-        self.required = required
-        self.input_type = input_type
-        self.max_length = max_length
-        self.place_holder = place_holder
-        self.options = options
-
-    def __str__(self):
-        return self.name
-
-    def get_label(self):
-        if self.required:
-            return '<span class="text-primary bg-info">{}</span>'.format(self.label)
-        return '<span class="text-muted">{}</span>'.format(self.label)
-
-    def get_required(self):
-        if self.required:
-            return 'required'
-        return ''
-
-    def get_placeholder(self):
-        if self.place_holder:
-            return 'placeholder={}'.format(self.place_holder)
-        return ''
-
-    def get_placeholder_content(self):
-        return self.place_holder
-
-    def get_max_length(self):
-        if self.max_length > 0:
-            if self.input_type == 'number':
-                return 'max={} step=any'.format(self.max_length)
-            else:
-                return 'maxlength={}'.format(self.max_length)
-        return ''
+from django import forms
+from django.template.loader_tags import register
 
 
 class FormReader:
@@ -58,3 +13,30 @@ class FormReader:
             return self.request.POST[name]
         else:
             return None
+
+
+@register.filter(name='is_textarea')
+def is_textarea(field):
+    return field.field.widget.__class__.__name__ == forms.Textarea().__class__.__name__
+
+
+@register.filter(name='is_checkbox')
+def is_textarea(field):
+    return field.field.widget.__class__.__name__ == forms.CheckboxInput().__class__.__name__
+
+
+class DataListWidget(forms.TextInput):
+    def __init__(self, data_list, name, *args, **kwargs):
+        super(DataListWidget, self).__init__(*args, **kwargs)
+        self._name = name
+        self._list = data_list
+        self.attrs.update({'list': 'list_{}'.format(self._name)})
+
+    def render(self, name, value, attrs=None):
+        text_html = super(DataListWidget, self).render(name, value, attrs=attrs)
+        data_list = '<datalist id="list_{}">'.format(self._name)
+        for item in self._list:
+            data_list += '<option value="{}">'.format(item)
+        data_list += '</datalist>'
+
+        return text_html + data_list

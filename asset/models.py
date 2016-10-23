@@ -1,7 +1,5 @@
 from django.db import models
 
-from utils.form_utils import FormData
-
 
 class CompanyManager(models.Manager):
     @staticmethod
@@ -93,6 +91,18 @@ class CompanyImage(models.Model):
         return self.company.get_name()
 
 
+class ClothManager(models.Manager):
+    @staticmethod
+    def create_cloth_from_form_data(form):
+        """Create an instance of Cloth from form data
+        :param form: Form data posted by user
+        :return: An instance of Cloth
+        """
+        cloth = Cloth()
+        cloth.serial_no = form['serial_no']
+        return cloth
+
+
 class Cloth(models.Model):
     serial_no = models.CharField(max_length=20, verbose_name='编号')
     name = models.CharField(max_length=20, blank=True, verbose_name='名称')
@@ -106,23 +116,8 @@ class Cloth(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    @staticmethod
-    def get_form_data():
-        form_list = [FormData('编号', 'serial_no', True, 'text', 20, '编号', None),
-                     FormData('名称', 'name', True, 'text', 20, '名称', None),
-                     FormData('材质', 'material', False, 'text', 20, '材质', None),
-                     FormData('详细信息', 'description', False, 'textarea', 1000, '添加详细信息', None),
-                     ]
-
-        return form_list
-
     def __str__(self):
-        if self.serial_no and self.name:
-            return self.serial_no + '-' + self.name
-        elif self.serial_no:
-            return self.serial_no
-        else:
-            return self.name
+        return self.serial_no + '-' + self.name
 
     def get_name(self):
         return self.__str__()

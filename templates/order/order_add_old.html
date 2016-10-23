@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %} 添加销售数据 {% endblock %}
+
+{% block content %}
+  <script>
+    function get_total_price(units, price) {
+      document.getElementById('id_total_price').innerHTML = '' + (units * price).toFixed(1);
+    }
+    function set_current_date(id) {
+      document.getElementById(id).value = moment().format('YYYY-MM-DD');
+    }
+  </script>
+
+  <div class="container-fluid">
+    <h1 class="page-header" align="center"><span class="text-primary">添加销售数据</span></h1>
+
+    <form class="form-horizontal" action="" method="post"
+          onchange="get_total_price(
+              document.getElementById('id_price_per_unit').value,
+              document.getElementById('id_total_units').value)">
+
+      {% csrf_token %}
+
+      {% for field in form_data %}
+        <div class="form-group">
+          {% if field.input_type == 'checkbox' %}
+            <label class="control-label col-sm-1" style="min-width: 120px"
+                   for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
+            <div class="col-sm-2" style="min-width: 240px">
+              <input class="checkbox" type="checkbox" style="min-width: 16px" id="id_{{ field.name }}"
+                     name="{{ field.name }}">
+            </div>
+          {% elif field.input_type == 'datalist' %}
+            <label class="control-label col-sm-1" style="min-width: 120px"
+                   for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
+            <div class="col-sm-2" style="min-width: 240px">
+              <input list="{{ field.name }}_list" class="form-control" id="id_{{ field.name }}"
+                     name="{{ field.name }}" {{ field.get_placeholder }}>
+              <datalist id="{{ field.name }}_list">
+                {% for customer in field.options %}
+                  <option value="{{ customer }}">
+                {% endfor %}
+              </datalist>
+            </div>
+          {% elif field.input_type == 'textarea' %}
+            <label class="control-label col-sm-1" style="min-width: 120px"
+                   for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
+            <div class="col-sm-6" style="min-width: 360px">
+          <textarea class="form-control" rows="9" id="id_{{ field.name }}"
+                    name="{{ field.name }}" {{ field.get_placeholder }} {{ field.get_required }}
+              {{ field.get_max_length }}></textarea>
+            </div>
+          {% elif field.input_type == 'autogen' %}
+            <label class="control-label col-sm-1" style="min-width: 120px"
+                   for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
+            <div class="col-sm-2" style="min-width: 240px">
+              <p class="form-control" id="id_{{ field.name }}"><span
+                  class="text-muted">{{ field.get_placeholder_content }}</span></p>
+            </div>
+          {% else %}
+            <label class="control-label col-sm-1 " style="min-width: 120px"
+                   for="id_{{ field.name }}">{{ field.get_label | safe }}</label>
+            <div class="col-sm-2" style="min-width: 240px">
+              <input class="form-control" type="{{ field.input_type }}" id="id_{{ field.name }}"
+                     name="{{ field.name }}"
+                  {{ field.get_placeholder }}
+                  {{ field.get_required }}
+                  {{ field.get_max_length }}
+              >
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <body onload="set_current_date('id_order_date')"></body>
+
+      <div class="form-group" id="order_details">
+        <label class="control-label col-sm-1" style="min-width: 120px"><span class="text-primary bg-info">添加详细数据</span></label>
+        <div class="row">
+          {% for detail_row in '12345' %}
+            <div class="col-sm-1" style="min-width: 120px">
+              {% for detail_col in '1234' %}
+                <input class="form-control" type="number" step="any"
+                       name="order_details_{{ detail_row }}_{{ detail_col }}" maxlength="1000">
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="control-label col-sm-1" style="min-width: 120px"></label>
+        <div class="col-sm-2" style="min-width: 240px">
+          <input class="btn btn-info btn-block" type="submit" value="提交">
+        </div>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

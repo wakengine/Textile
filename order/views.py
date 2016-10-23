@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, Http404
 from django.views import View
 
+from order.forms import OrderForm
 from .models import Order, OrderManager
 
 
@@ -24,13 +25,14 @@ class CreateOrder(View):
     template_name = 'order/order_add.html'
 
     def get(self, request):
-        form = OrderManager.get_form_data()
-        return render(request, self.template_name, {'form_data': form})
+        form = OrderForm()
+        return render(request, self.template_name, {'form_fields': form})
 
     def post(self, request):
-        order = OrderManager.read_and_save_order(request)
-        if not order:
-            raise Http404('TODO: cannot add the order with same serial id again.')
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            order = OrderManager.create_order_from_form_data(form)
+            order.save()
 
+        raise Http404('TODO: Not implemented.')
         return redirect('order:show')
-        raise Http404('At least one of the fields is invalid...')

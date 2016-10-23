@@ -6,14 +6,41 @@
   <div class="container-fluid">
     <h1 class="page-header" align="center"><span class="text-primary">添加布料</span></h1>
 
-    <form class="form-horizontal" action="" method="post">
+    <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
+      {% for field in form_fields %}
+        <div class="form-group">
+          {% if field|is_checkbox %}
+            <label class="control-label col-sm-1" style="min-width: 120px"
+                   for="{{ field.id_for_label }}"><span class="text-primary bg-info">{{ field.label }}</span></label>
+            <div class="col-sm-2" style="min-width: 240px;margin-top: 5px;">
+              {{ field }}
+            </div>
+          {% else %}
+            {% if field.field.required %}
+              <label class="control-label col-sm-1" for="{{ field.id_for_label }}" style="min-width: 120px"><span
+                  class="text-primary bg-info">{{ field.label }}</span><span
+                  class="text-danger">*</span></label>
+            {% else %}
+              <label class="control-label col-sm-1" for="{{ field.id_for_label }}" style="min-width: 120px"><span
+                  class="text-primary bg-info">{{ field.label }}</span></label>
+            {% endif %}
 
-      {% include 'form_template.html' %}
-
+            {% if field|is_textarea %}
+              <div class="col-sm-6" style="min-width: 360px">
+                {{ field }}
+              </div>
+            {% else %}
+              <div class="col-sm-2" style="min-width: 240px">
+                {{ field }}
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endfor %}
       <div class="form-group">
-          <label class="control-label col-sm-1" style="min-width: 120px"></label>
-          <div class="col-sm-2" style="min-width: 240px">
+        <label class="control-label col-sm-1" style="min-width: 120px"></label>
+        <div class="col-sm-2" style="min-width: 240px">
           <input class="btn btn-info btn-block" type="submit" value="提交">
         </div>
       </div>

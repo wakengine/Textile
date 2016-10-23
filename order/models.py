@@ -1,111 +1,17 @@
 from django.db import models
 
 from asset.models import Company, Cloth
-from utils.form_utils import FormData, FormReader
 
 
 class OrderManager(models.Manager):
-    ID_PREFIX = '__'
-
     @staticmethod
-    def get_form_data():
-        customer_list = Company.objects.all()
-        customers = []
-        for customer in customer_list:
-            customers.append('{}{}{}'.format(customer.get_name(), OrderManager.ID_PREFIX, customer.pk))
-
-        cloth_list = Cloth.objects.all()
-        clothes = []
-        for cloth in cloth_list:
-            clothes.append('{}{}{}'.format(cloth.get_name(), OrderManager.ID_PREFIX, cloth.pk))
-
-        form_list = [FormData('单号', 'serial_no', True, 'text', 20, '单号', None),
-                     FormData('客户', 'customer', True, 'datalist', 0, '', customers),
-                     FormData('布料', 'cloth', True, 'datalist', 0, '', clothes),
-                     FormData('颜色', 'color', True, 'text', 20, '色号', None),
-                     FormData('单价', 'price_per_unit', True, 'number', 1000, '0.0', None),
-                     FormData('总米数/重量', 'total_units', True, 'number', 100000, '0.0', None),
-                     FormData('总价', 'total_price', True, 'autogen', 0, '0.0', None),
-                     FormData('总匹数', 'total_bundles', True, 'number', 1000, '0.0', None),
-                     FormData('下单日期', 'order_date', True, 'date', 0, '', None),
-                     FormData('欠款', 'is_not_paid', False, 'checkbox', 0, '', None),
-                     FormData('退单', 'is_withdrawn', False, 'checkbox', 0, '', None),
-                     FormData('仓库', 'is_warehouse', False, 'checkbox', 0, '', None),
-                     FormData('上传图片', 'image', False, 'file', 0, '', None),
-                     FormData('详细描述', 'description', False, 'textarea', 1000, '添加详细描述', None),
-                     ]
-
-        return form_list
-
-    @staticmethod
-    def read_and_save_order(request):
-        form = FormReader(request)
-
-        serial_no = form.get_post_data('serial_no')
-        customer = form.get_post_data('customer')
-        cloth = form.get_post_data('cloth')
-        color = form.get_post_data('color')
-        price_per_unit = float(form.get_post_data('price_per_unit'))
-        total_units = float(form.get_post_data('total_units'))
-        total_bundles = float(form.get_post_data('total_bundles'))
-        order_date = form.get_post_data('order_date')
-        is_not_paid = form.get_post_data('is_not_paid')
-        is_withdrawn = form.get_post_data('is_withdrawn')
-        is_warehouse = form.get_post_data('is_warehouse')
-        description = form.get_post_data('description')
-
-        try:
-            Order.objects.get(serial_no=serial_no)
-            return None
-        except Order.DoesNotExist:
-            pass
-
-        _, _, customer_id = customer.partition(OrderManager.ID_PREFIX)
-        if not customer_id:
-            new_customer = Company()
-            new_customer.name = customer
-            new_customer.owner_name = customer
-            new_customer.relationship = 'C'
-            new_customer.save()
-            customer_id = new_customer.pk
-
-        _, _, cloth_id = cloth.partition(OrderManager.ID_PREFIX)
-        if not cloth_id:
-            new_cloth = Cloth()
-            new_cloth.serial_no = cloth
-            new_cloth.name = cloth
-            new_cloth.save()
-            cloth_id = new_cloth.pk
-
+    def create_order_from_form_data(form):
+        """Create an instance of Cloth from form data
+        :param form: Form data posted by user
+        :return: An instance of Cloth
+        """
         order = Order()
-
-        order.serial_no = serial_no
-        order.internal_id = serial_no  # WA for now
-        order.customer_id = customer_id
-        order.cloth_id = cloth_id
-        order.color = color
-        order.price_per_unit = price_per_unit
-        order.total_units = total_units
-        order.total_price = price_per_unit * total_units
-        order.total_bundles = total_bundles
-        order.order_date = order_date
-        order.is_not_paid = True if is_not_paid else False
-        order.is_withdrawn = True if is_withdrawn else False
-        order.is_warehouse = True if is_warehouse else False
-        order.description = description
-        order.save()
-
-        for detail_row in '12345':
-            for detail_col in '1234':
-                detail_data = form.get_post_data('order_details_{}_{}'.format(detail_row, detail_col))
-                if not detail_data:
-                    continue
-                detail_meter = float(detail_data)
-                detail_obj = OrderDetail()
-                detail_obj.order_id = order.pk
-                detail_obj.meter = detail_meter
-                detail_obj.save()
-
+        order.serial_no = form['serial_no']
         return order
 
     def get_total_price(self):
