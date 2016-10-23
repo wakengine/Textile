@@ -6,9 +6,9 @@ from asset.models import Company, Cloth
 class OrderManager(models.Manager):
     @staticmethod
     def create_order_from_form_data(form):
-        """Create an instance of Cloth from form data
+        """Create an instance of Order from form data
         :param form: Form data posted by user
-        :return: An instance of Cloth
+        :return: An instance of Order
         """
         order = Order()
         order.serial_no = form['serial_no']
