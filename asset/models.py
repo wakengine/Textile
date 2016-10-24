@@ -1,94 +1,89 @@
 from django.db import models
 
 
-class CompanyManager(models.Manager):
+class Image(models.Model):
+    """Base image class"""
+    image = models.FileField()
+    description = models.CharField(max_length=100, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class EntityManager(models.Manager):
     @staticmethod
     def create_company_from_form_data(form):
         """Create an instance of Company from form data
         :param form: Form data posted by user
         :return: An instance of Company
         """
-        company = Company()
-        company.name = form['name']
-        company.owner_name = form['owner_name']
-        company.relationship = form['relationship']
-        company.description = form['description']
-        return company
+        entity = Entity()
+        entity.entity_name = form['entity_name']
+        entity.relationship = form['relationship']
+        entity.description = form['description']
+        return entity
 
 
-class Company(models.Model):
+class Entity(models.Model):
     RelationShip = (
         ('C', 'Customer'),
         ('S', 'Supplier'),
         ('B', 'Both'),
     )
 
-    name = models.CharField(max_length=20)
-    owner_name = models.CharField(max_length=20, blank=True)
+    entity_name = models.CharField(max_length=20)
     relationship = models.CharField(max_length=1, default='C', choices=RelationShip)
-    phone = models.CharField(max_length=20, blank=True)
+    telephone = models.CharField(max_length=20, blank=True)
     fax = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     address = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = CompanyManager()
+    objects = EntityManager()
 
     def __str__(self):
-        if self.owner_name and self.name:
-            return self.owner_name + '@' + self.name
-        elif self.name:
-            return self.name
-        else:
-            return self.owner_name
+        return self.entity_name
 
     def save(self, *args, **kwargs):
-        if not self.is_valid():
-            raise ValueError("Must provide owner name or shop name")
-        super(Company, self).save(*args, **kwargs)
-
-    def is_valid(self):
-        # Must have either name or owner name.
-        if not self.name and not self.owner_name:
-            return False
-        return True
+        super(Entity, self).save(*args, **kwargs)
 
     def get_name(self):
         return self.__str__()
 
 
 class BankInfo(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     account_name = models.CharField(max_length=20)
     bank_name = models.CharField(max_length=20)
     bank_number = models.CharField(max_length=20)
+    description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.company.get_name()
+        return self.entity.get_name()
 
 
-class CompanyContact(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+class EntityContact(models.Model):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     contact_person = models.CharField(max_length=10, blank=True)
     position = models.CharField(max_length=10, blank=True)
-    phone = models.CharField(max_length=20, blank=True)
+    telephone = models.CharField(max_length=20, blank=True)
     email = models.EmailField(blank=True)
     address = models.CharField(max_length=100, blank=True)
+    description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.company.get_name()
+        return self.entity.get_name()
 
 
-class CompanyImage(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    img_path = models.CharField(max_length=100, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
+class EntityImage(Image):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.company.get_name()
+        return self.entity.get_name()
 
 
 class ClothManager(models.Manager):
@@ -104,50 +99,40 @@ class ClothManager(models.Manager):
 
 
 class Cloth(models.Model):
-    serial_no = models.CharField(max_length=20, verbose_name='编号')
-    name = models.CharField(max_length=20, blank=True, verbose_name='名称')
-    material = models.CharField(max_length=20, blank=True, verbose_name='材质')
-    texture = models.CharField(max_length=20, blank=True, verbose_name='纹理')
-    width = models.FloatField(default=150, blank=True, verbose_name='幅宽')
-    ref_price = models.FloatField(default=0, blank=True, verbose_name='推荐价格')
-    is_per_meter = models.BooleanField(default=True, verbose_name='是否为长度')
-    used_for = models.CharField(max_length=100, blank=True, verbose_name='用途')
-    description = models.TextField(max_length=1000, blank=True, verbose_name='详细描述')
+    serial_no = models.CharField(max_length=20)
+    cloth_name = models.CharField(max_length=20, blank=True)
+    material = models.CharField(max_length=20, blank=True)
+    texture = models.CharField(max_length=20, blank=True)
+    width = models.IntegerField(default=150, blank=True)
+    ref_price = models.FloatField(default=0, blank=True)
+    is_per_meter = models.BooleanField(default=True)
+    used_for = models.CharField(max_length=100, blank=True)
+    description = models.TextField(max_length=1000, blank=True)
     created_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.serial_no + '-' + self.name
+        return self.serial_no + '_' + self.cloth_name
 
     def get_name(self):
         return self.__str__()
 
 
-class ClothDetail(models.Model):
-    cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
-    timestamp = models.DateTimeField(auto_now=True)
+class ClothImage(Image):
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.cloth.get_name()
 
 
-class ClothImage(models.Model):
-    cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
-    img_path = models.CharField(max_length=100, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.cloth.get_name()
-
-
-class ClothInCompany(models.Model):
+class ClothInShop(models.Model):
     """Indicates which shop has which cloth or which cloth can be found in which shop
     It's a Many-to-Many relationship between Shop and Cloth.
     """
     serial_no = models.CharField(max_length=10, blank=True,
                                  help_text='(Different shops which owns the same cloth have different number)')
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
-    cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
+    shop = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
     num_of_colors = models.IntegerField(default=0, blank=True)
     price = models.FloatField(default=0, blank=True)
     price_detail = models.CharField(max_length=100, blank=True)
@@ -156,25 +141,26 @@ class ClothInCompany(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth.get_name() + '@' + self.company.get_name()
+        return self.cloth.get_name() + '@' + self.shop.get_name()
+
+    def get_name(self):
+        return self.__str__()
 
 
-class ClothImageInCompany(models.Model):
-    cloth_in_company = models.ForeignKey(ClothInCompany, on_delete=models.PROTECT)
-    img_path = models.CharField(max_length=100, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
+class ClothInShopImage(Image):
+    cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.cloth_in_company.__str__()
+        return self.cloth_in_shop.get_name()
 
 
 class ColorMap(models.Model):
     """Used for mapping two vendor's color for the same cloth
     """
-    cloth_in_company = models.ForeignKey(ClothInCompany, on_delete=models.PROTECT)
+    cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
     internal_color = models.CharField(max_length=10)
     external_color = models.CharField(max_length=10)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth_in_company.__str__()
+        return self.cloth_in_shop.get_name()
