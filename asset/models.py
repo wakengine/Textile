@@ -11,6 +11,15 @@ class Image(models.Model):
         abstract = True
 
 
+class Color(models.Model):
+    color_id = models.CharField(max_length=10)
+    color_name = models.CharField(max_length=10, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class EntityManager(models.Manager):
     @staticmethod
     def create_company_from_form_data(form):
@@ -118,6 +127,13 @@ class Cloth(models.Model):
         return self.__str__()
 
 
+class ColorOfCloth(Cloth):
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.cloth.get_name()
+
+
 class ClothImage(Image):
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
 
@@ -158,8 +174,10 @@ class ColorMap(models.Model):
     """Used for mapping two vendor's color for the same cloth
     """
     cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
-    internal_color = models.CharField(max_length=10)
-    external_color = models.CharField(max_length=10)
+    internal_color_id = models.CharField(max_length=10)
+    internal_color_name = models.CharField(max_length=10)
+    external_color_id = models.CharField(max_length=10)
+    external_color_name = models.CharField(max_length=10)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
