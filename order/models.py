@@ -31,7 +31,7 @@ class Order(models.Model):
     color = models.CharField(max_length=20)
     price_per_unit = models.FloatField()
     total_units = models.FloatField()
-    total_bundles = models.FloatField(default=0, blank=True)
+    total_rolls = models.FloatField(default=0, blank=True)
     total_price = models.FloatField()
     is_not_paid = models.BooleanField(default=False)
     is_withdrawn = models.BooleanField(default=False)
@@ -47,6 +47,10 @@ class Order(models.Model):
 
     def get_name(self):
         return self.__str__()
+
+    def generate_internal_id(self):
+        """TODO"""
+        self.internal_id = self.serial_no
 
 
 class OrderDetail(models.Model):

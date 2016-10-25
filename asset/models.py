@@ -11,21 +11,12 @@ class Image(models.Model):
         abstract = True
 
 
-class Color(models.Model):
-    color_id = models.CharField(max_length=10)
-    color_name = models.CharField(max_length=10, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
-
-
 class EntityManager(models.Manager):
     @staticmethod
-    def create_company_from_form_data(form):
-        """Create an instance of Company from form data
+    def create_entity_from_form_data(form):
+        """Create an instance of Entity from form data
         :param form: Form data posted by user
-        :return: An instance of Company
+        :return: An instance of Entity
         """
         entity = Entity()
         entity.entity_name = form['entity_name']
@@ -108,6 +99,11 @@ class ClothManager(models.Manager):
 
 
 class Cloth(models.Model):
+    SALE_UNIT = (
+        ('M', 'Meter'),
+        ('Y', 'Yard'),
+        ('KG', 'Kilogram'),
+    )
     serial_no = models.CharField(max_length=20)
     cloth_name = models.CharField(max_length=20, blank=True)
     material = models.CharField(max_length=20, blank=True)
@@ -127,8 +123,11 @@ class Cloth(models.Model):
         return self.__str__()
 
 
-class ColorOfCloth(Cloth):
+class ColorOfCloth(models.Model):
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+    color_id = models.CharField(max_length=10)
+    color_name = models.CharField(max_length=10, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.cloth.get_name()

@@ -4,8 +4,8 @@ from . import views
 
 app_name = 'asset'
 urlpatterns = [
-    url(r'^company/add', views.AddCompany.as_view(), name='add_company'),
-    url(r'^company/list', views.AddCompany.as_view(), name='company_list'),
+    url(r'^entity/add', views.AddEntity.as_view(), name='add_entity'),
+    url(r'^entity/list', views.AddEntity.as_view(), name='entity_list'),
     url(r'^cloth/add', views.AddCloth.as_view(), name='add_cloth'),
-    url(r'^cloth/list', views.AddCompany.as_view(), name='cloth_list'),
+    url(r'^cloth/list', views.AddCloth.as_view(), name='cloth_list'),
 ]

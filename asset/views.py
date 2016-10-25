@@ -6,8 +6,8 @@ from .forms import EntityForm, ClothForm
 from .models import EntityManager, ClothManager
 
 
-class AddCompany(View):
-    template_name = 'asset/company_add.html'
+class AddEntity(View):
+    template_name = 'asset/entity_add.html'
 
     def get(self, request):
         form = EntityForm()
@@ -16,8 +16,8 @@ class AddCompany(View):
     def post(self, request):
         form = EntityForm(request.POST)
         if form.is_valid():
-            company = EntityManager.create_company_from_form_data(form.cleaned_data)
-            company.save()
+            entity = EntityManager.create_entity_from_form_data(form.cleaned_data)
+            entity.save()
 
         raise Http404('Not implemented')
 
@@ -32,6 +32,6 @@ class AddCloth(View):
     def post(self, request):
         form = ClothForm(request.POST)
         if form.is_valid():
-            cloth = ClothManager.create_cloth_from_form_data();
+            cloth = ClothManager.create_cloth_from_form_data(form)
             cloth.save()
         raise Http404('Not implemented')
