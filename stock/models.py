@@ -30,22 +30,28 @@ class StockManager(models.Manager):
         :param form: Form data posted by user
         :return: An instance of Inventory
         """
-        inventory = ClothInStock()
-        inventory.cloth = Cloth()
+        inventory = Inventory()
+        inventory.roll_of_cloth = RollOfCloth()
         return inventory
 
 
-class ClothInStock(models.Model):
-    STOCK_LOCATION = (
-        ('GZ', 'Guangzhou'),
-        ('KQ', 'Keqiao'),
-    )
+class Warehouse(models.Model):
+    name = models.CharField(max_length=20)
+    address = models.CharField(max_length=100)
+    contact = models.CharField(max_length=20, blank=True)
+    telephone = models.CharField(max_length=20, blank=True)
+    description = models.TextField(max_length=1000, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
+
+class Inventory(models.Model):
     roll_of_cloth = models.ForeignKey(RollOfCloth, on_delete=models.PROTECT)
-    location = models.CharField(max_length=3, default='GZ', choices=STOCK_LOCATION)
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT)
     stock_in_date = models.DateField(auto_now_add=False)
     stock_out_date = models.DateField(auto_now_add=False, blank=True)
-    is_in_stock = models.BooleanField(default=True, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -56,7 +62,7 @@ class ClothInStock(models.Model):
 
 
 class PieceOfCloth(models.Model):
-    belong_to = models.ForeignKey(ClothInStock, on_delete=models.CASCADE)
+    belong_to = models.ForeignKey(Inventory, on_delete=models.CASCADE)
     sale_meter = models.FloatField()
     manual_adjust = models.FloatField(default=0.0, blank=True)
     description = models.TextField(max_length=1000, blank=True)

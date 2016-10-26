@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, max_length=1000)),
                 ('order_date', models.DateField()),
                 ('timestamp', models.DateTimeField(auto_now=True)),
-                ('belong_to', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stock.ClothInStock')),
+                ('belong_to', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='stock.models.Inventory')),
             ],
         ),
         migrations.CreateModel(

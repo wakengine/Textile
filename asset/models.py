@@ -34,10 +34,6 @@ class Entity(models.Model):
 
     entity_name = models.CharField(max_length=20)
     relationship = models.CharField(max_length=1, default='C', choices=RelationShip)
-    telephone = models.CharField(max_length=20, blank=True)
-    fax = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
-    address = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -51,6 +47,13 @@ class Entity(models.Model):
 
     def get_name(self):
         return self.__str__()
+
+
+class EntityImage(Image):
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.entity.get_name()
 
 
 class BankInfo(models.Model):
@@ -69,9 +72,6 @@ class EntityContact(models.Model):
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     contact_person = models.CharField(max_length=10, blank=True)
     position = models.CharField(max_length=10, blank=True)
-    telephone = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(blank=True)
-    address = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -79,11 +79,33 @@ class EntityContact(models.Model):
         return self.entity.get_name()
 
 
-class EntityImage(Image):
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+class ContactMethod(models.Model):
+    METHODS = (
+        ('tel', 'Telephone'),
+        ('fax', 'Fax'),
+        ('email', 'Email'),
+        ('wechat', 'Wechat'),
+        ('address', 'Address'),
+        ('website', 'Website'),
+        ('other', 'Other'),
+    )
 
-    def __str__(self):
-        return self.entity.get_name()
+    CATEGORY = (
+        ('personal', 'Personal'),
+        ('office', 'Office'),
+        ('home', 'Home'),
+        ('other', 'Other'),
+    )
+
+    method = models.CharField(max_length=10, default='tel', choices=METHODS)
+    category = models.CharField(max_length=10, default='personal', choices=CATEGORY)
+    content = models.CharField(max_length=100)
+    description = models.TextField(max_length=1000, blank=True)
+
+
+class EntityContactMethod(models.Model):
+    contact = models.ForeignKey(EntityContact, on_delete=models.CASCADE)
+    method = models.ForeignKey(ContactMethod, null=True, on_delete=models.SET_NULL)
 
 
 class ClothManager(models.Manager):
