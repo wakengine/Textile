@@ -25,6 +25,14 @@ class EntityManager(models.Manager):
         return entity
 
 
+class ContactType(models.Model):
+    type = models.CharField(max_length=20)
+    description = models.TextField(max_length=100)
+
+    def __str(self):
+        return self.type
+
+
 class Entity(models.Model):
     RelationShip = (
         ('C', 'Customer'),
@@ -33,7 +41,7 @@ class Entity(models.Model):
     )
 
     entity_name = models.CharField(max_length=20)
-    relationship = models.CharField(max_length=1, default='C', choices=RelationShip)
+    relationship = models.ForeignKey(ContactType, on_delete=models.CASCADE)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
