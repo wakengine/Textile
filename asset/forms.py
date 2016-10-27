@@ -1,4 +1,3 @@
-from asset.models import Entity
 from utils.form_utils import *
 
 
@@ -9,10 +8,15 @@ class EntityForm(forms.Form):
         max_length=20,
     )
 
+    RelationShip = (
+        ('C', 'Customer'),
+        ('S', 'Supplier'),
+        ('B', 'Both'),
+    )
     relationship = forms.ChoiceField(
         label='关系',
         widget=forms.Select(attrs={'class': 'form-control'}),
-        choices=Entity.RelationShip,
+        choices=RelationShip,
     )
 
     country_list = ('Mexico', 'USA', 'China', 'France')

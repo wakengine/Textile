@@ -2,8 +2,12 @@ from django.db import models
 
 
 class Image(models.Model):
-    """Base image class"""
+    """
+    Base image class, may be used by any model.
+    """
+
     image = models.FileField()
+    path = models.CharField(max_length=100)
     description = models.CharField(max_length=100, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -12,82 +16,40 @@ class Image(models.Model):
 
 
 class EntityManager(models.Manager):
+    """
+    Manage BusinessEntity related models.
+    """
+
     @staticmethod
     def create_entity_from_form_data(form):
-        """Create an instance of Entity from form data
+        """
+        Create an instance of Entity from form data
         :param form: Form data posted by user
         :return: An instance of Entity
         """
-        entity = Entity()
+        entity = BusinessEntity()
         entity.entity_name = form['entity_name']
-        entity.relationship = form['relationship']
-        entity.description = form['description']
         return entity
 
 
 class ContactType(models.Model):
-    type = models.CharField(max_length=20)
-    description = models.TextField(max_length=100)
+    """
+    Indicate the relationship with an entity.
+    These relationship may include such as Customer, Supplier, etc.
+    """
+    type = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str(self):
         return self.type
 
 
-class Entity(models.Model):
-    RelationShip = (
-        ('C', 'Customer'),
-        ('S', 'Supplier'),
-        ('B', 'Both'),
-    )
+class ContactData(models.Model):
+    """
+    Indicate how to contact a person or a company.
+    """
 
-    entity_name = models.CharField(max_length=20)
-    relationship = models.ForeignKey(ContactType, on_delete=models.CASCADE)
-    description = models.TextField(max_length=1000, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    objects = EntityManager()
-
-    def __str__(self):
-        return self.entity_name
-
-    def save(self, *args, **kwargs):
-        super(Entity, self).save(*args, **kwargs)
-
-    def get_name(self):
-        return self.__str__()
-
-
-class EntityImage(Image):
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.entity.get_name()
-
-
-class BankInfo(models.Model):
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-    account_name = models.CharField(max_length=20)
-    bank_name = models.CharField(max_length=20)
-    bank_number = models.CharField(max_length=20)
-    description = models.TextField(max_length=1000, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.entity.get_name()
-
-
-class EntityContact(models.Model):
-    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
-    contact_person = models.CharField(max_length=10, blank=True)
-    position = models.CharField(max_length=10, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.entity.get_name()
-
-
-class ContactMethod(models.Model):
     METHODS = (
         ('tel', 'Telephone'),
         ('fax', 'Fax'),
@@ -109,11 +71,104 @@ class ContactMethod(models.Model):
     category = models.CharField(max_length=10, default='personal', choices=CATEGORY)
     content = models.CharField(max_length=100)
     description = models.TextField(max_length=1000, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str(self):
+        return '{}:{}:{}'.format(self.category, self.method, self.content)
 
 
-class EntityContactMethod(models.Model):
-    contact = models.ForeignKey(EntityContact, on_delete=models.CASCADE)
-    method = models.ForeignKey(ContactMethod, null=True, on_delete=models.SET_NULL)
+class BusinessEntity(models.Model):
+    entity_name = models.CharField(max_length=20)
+    description = models.TextField(max_length=1000, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    objects = EntityManager()
+
+    def __str__(self):
+        return self.entity_name
+
+    def get_name(self):
+        return self.__str__()
+
+
+class EntityRoleMap(models.Model):
+    entity = models.ForeignKey(BusinessEntity, on_delete=models.PROTECT)
+    role = models.ForeignKey(ContactType, on_delete=models.PROTECT)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.entity.get_name()
+
+
+class EntityImage(Image):
+    entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.entity.get_name()
+
+
+class BusinessContact(models.Model):
+    contact_name = models.CharField(max_length=10, blank=True)
+    entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
+    position = models.CharField(max_length=10, blank=True)
+    description = models.TextField(max_length=1000, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{}@{}'.format(self.contact_name, self.entity.get_name())
+
+
+class EntityContactImage(Image):
+    contact = models.ForeignKey(BusinessContact, on_delete=models.CASCADE)
+
+
+class BusinessContactDetail(models.Model):
+    contact = models.ForeignKey(BusinessContact, on_delete=models.CASCADE)
+    method = models.ForeignKey(ContactData, on_delete=models.CASCADE)
+
+
+class PaymentAccountType(models.Model):
+    """
+    How the customer paid, it may include cash, via bank, alipay etc.
+    """
+
+    type = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
+class PaymentAccountData(models.Model):
+    user_name = models.CharField(max_length=20)
+    org_name = models.CharField(max_length=20)
+    account_number = models.CharField(max_length=20)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
+class PaymentAccount(models.Model):
+    account_type = models.ForeignKey(PaymentAccountType, on_delete=models.PROTECT)
+    account_data = models.ForeignKey(PaymentAccountData, on_delete=models.PROTECT)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
+class EntityPayment(models.Model):
+    entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
+    account = models.ForeignKey(PaymentAccount, on_delete=models.PROTECT)
+    description = models.TextField(max_length=1000, blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.entity.get_name()
+
+    def get_name(self):
+        return self.__str__()
+
+
+class EntityPaymentImage(Image):
+    entity_payment = models.ForeignKey(EntityPayment, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.entity_payment.get_name()
 
 
 class ClothManager(models.Manager):
@@ -176,7 +231,7 @@ class ClothInShop(models.Model):
     """
     serial_no = models.CharField(max_length=10, blank=True,
                                  help_text='(Different shops which owns the same cloth have different number)')
-    shop = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    shop = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
     num_of_colors = models.IntegerField(default=0, blank=True)
     price = models.FloatField(default=0, blank=True)

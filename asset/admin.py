@@ -2,10 +2,10 @@ from django.contrib import admin
 
 from .models import *
 
-admin.site.register(Entity)
-admin.site.register(EntityContact)
+admin.site.register(BusinessEntity)
+admin.site.register(BusinessContact)
 admin.site.register(EntityImage)
-admin.site.register(BankInfo)
+admin.site.register(EntityPayment)
 admin.site.register(Cloth)
 admin.site.register(ClothImage)
 admin.site.register(ClothInShop)

@@ -1,6 +1,6 @@
 from django.db import models
 
-from asset.models import Entity, Cloth, Image
+from asset.models import BusinessEntity, Cloth, Image
 
 
 class OrderManager(models.Manager):
@@ -26,7 +26,7 @@ class OrderManager(models.Manager):
 class Order(models.Model):
     serial_no = models.CharField(max_length=20)
     internal_id = models.CharField(max_length=20)
-    customer = models.ForeignKey(Entity, on_delete=models.PROTECT)
+    customer = models.ForeignKey(BusinessEntity, on_delete=models.PROTECT)
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
     color = models.CharField(max_length=20)
     price_per_unit = models.FloatField()
