@@ -32,7 +32,7 @@ class EntityManager(models.Manager):
         return entity
 
 
-class ContactType(models.Model):
+class PartnerType(models.Model):
     """
     Indicate the relationship with an entity.
     These relationship may include such as Customer, Supplier, etc.
@@ -45,7 +45,7 @@ class ContactType(models.Model):
         return self.type
 
 
-class ContactData(models.Model):
+class ContactWayData(models.Model):
     """
     Indicate how to contact a person or a company.
     """
@@ -78,6 +78,10 @@ class ContactData(models.Model):
 
 
 class BusinessEntity(models.Model):
+    """
+    The business entity is always the one we should work with. It may have its owner or employee,
+    but we it's the entity we should make an order belong to.
+    """
     entity_name = models.CharField(max_length=20)
     description = models.TextField(max_length=1000, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
@@ -92,8 +96,11 @@ class BusinessEntity(models.Model):
 
 
 class EntityRoleMap(models.Model):
+    """
+    Indicate a relationship with a business entity, a business entity alone may be a customer or supplier.
+    """
     entity = models.ForeignKey(BusinessEntity, on_delete=models.PROTECT)
-    role = models.ForeignKey(ContactType, on_delete=models.PROTECT)
+    role = models.ForeignKey(PartnerType, on_delete=models.PROTECT)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -101,13 +108,31 @@ class EntityRoleMap(models.Model):
 
 
 class EntityImage(Image):
+    """
+    Use to save general images related to a specific business entity.
+    """
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.entity.get_name()
 
 
+class EntityContactWay(models.Model):
+    """
+    Indicate how to contact with a business entity directly instead of via its employee.
+    This is generally used for saving a company's address
+    """
+    entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
+    contact_way = models.ForeignKey(ContactWayData, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.entity.get_name()
+
+
 class BusinessContact(models.Model):
+    """
+    A BusinessContact is either an employee or the entity's owner, it's a human being.
+    """
     contact_name = models.CharField(max_length=10, blank=True)
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
     position = models.CharField(max_length=10, blank=True)
@@ -118,18 +143,24 @@ class BusinessContact(models.Model):
         return '{}@{}'.format(self.contact_name, self.entity.get_name())
 
 
-class EntityContactImage(Image):
+class BusinessContactWay(models.Model):
+    """
+    Indicate how to contact with a person who belongs to a specific business entity.
+    """
     contact = models.ForeignKey(BusinessContact, on_delete=models.CASCADE)
+    contact_way = models.ForeignKey(ContactWayData, on_delete=models.CASCADE)
 
 
-class BusinessContactDetail(models.Model):
+class BusinessContactImage(Image):
+    """
+    It can be used to save business cards.
+    """
     contact = models.ForeignKey(BusinessContact, on_delete=models.CASCADE)
-    method = models.ForeignKey(ContactData, on_delete=models.CASCADE)
 
 
 class PaymentAccountType(models.Model):
     """
-    How the customer paid, it may include cash, via bank, alipay etc.
+    How the customer paid, it may include cash, via bank, Alipay etc.
     """
 
     type = models.CharField(max_length=20, unique=True)
@@ -138,11 +169,14 @@ class PaymentAccountType(models.Model):
 
 
 class PaymentAccountData(models.Model):
-    user_name = models.CharField(max_length=20)
+    owner_name = models.CharField(max_length=20)
     org_name = models.CharField(max_length=20)
     account_number = models.CharField(max_length=20)
     description = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{}@{}'.format(self.owner_name, self.org_name)
 
 
 class PaymentAccount(models.Model):
@@ -165,6 +199,9 @@ class EntityPayment(models.Model):
 
 
 class EntityPaymentImage(Image):
+    """
+    This can be used for saving bank card images if no time to provide detail data in PaymentAccount
+    """
     entity_payment = models.ForeignKey(EntityPayment, on_delete=models.CASCADE)
 
     def __str__(self):
