@@ -220,22 +220,31 @@ class ClothManager(models.Manager):
         return cloth
 
 
+class ClothCategory(models.Model):
+    """
+    Indicate the general category of cloth, such as if it's plain color,
+    """
+    category_name = models.CharField(max_length=10)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
 class Cloth(models.Model):
     SALE_UNIT = (
         ('M', 'Meter'),
         ('Y', 'Yard'),
         ('KG', 'Kilogram'),
     )
+
     serial_no = models.CharField(max_length=20)
     cloth_name = models.CharField(max_length=20, blank=True)
     material = models.CharField(max_length=20, blank=True)
     texture = models.CharField(max_length=20, blank=True)
     width = models.IntegerField(default=150, blank=True)
-    ref_price = models.FloatField(default=0, blank=True)
-    is_per_meter = models.BooleanField(default=True)
+    sale_unit = models.CharField(max_length=5, default='M')
     used_for = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
-    created_time = models.DateTimeField(auto_now_add=True)
+    added_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -243,6 +252,16 @@ class Cloth(models.Model):
 
     def get_name(self):
         return self.__str__()
+
+
+class ClothImage(Image):
+    """
+    Show the detail of the cloth or the color card of the cloth.
+    """
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.cloth.get_name()
 
 
 class ColorOfCloth(models.Model):
@@ -255,26 +274,19 @@ class ColorOfCloth(models.Model):
         return self.cloth.get_name()
 
 
-class ClothImage(Image):
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.cloth.get_name()
-
-
 class ClothInShop(models.Model):
-    """Indicates which shop has which cloth or which cloth can be found in which shop
+    """
+    Indicates which shop has which cloth or which cloth can be found in which shop
     It's a Many-to-Many relationship between Shop and Cloth.
     """
-    serial_no = models.CharField(max_length=10, blank=True,
-                                 help_text='(Different shops which owns the same cloth have different number)')
-    shop = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+    shop = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
+    shop_code = models.CharField(max_length=10, blank=True)
     num_of_colors = models.IntegerField(default=0, blank=True)
     price = models.FloatField(default=0, blank=True)
     price_detail = models.CharField(max_length=100, blank=True)
     description = models.TextField(max_length=1000, blank=True)
-    created_time = models.DateField(auto_now_add=True)
+    added_time = models.DateField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -292,13 +304,14 @@ class ClothInShopImage(Image):
 
 
 class ColorMap(models.Model):
-    """Used for mapping two vendor's color for the same cloth
+    """
+    Used for mapping two vendor's color for the same cloth
     """
     cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
     internal_color_id = models.CharField(max_length=10)
-    internal_color_name = models.CharField(max_length=10)
     external_color_id = models.CharField(max_length=10)
-    external_color_name = models.CharField(max_length=10)
+    internal_color_name = models.CharField(max_length=10, blank=True)
+    external_color_name = models.CharField(max_length=10, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
