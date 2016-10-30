@@ -7,29 +7,12 @@ class Image(models.Model):
     """
 
     image = models.FileField()
-    path = models.CharField(max_length=100)
+    path = models.FilePathField()
     description = models.CharField(max_length=100, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
-
-
-class EntityManager(models.Manager):
-    """
-    Manage BusinessEntity related models.
-    """
-
-    @staticmethod
-    def create_entity_from_form_data(form):
-        """
-        Create an instance of Entity from form data
-        :param form: Form data posted by user
-        :return: An instance of Entity
-        """
-        entity = BusinessEntity()
-        entity.entity_name = form['entity_name']
-        return entity
 
 
 class PartnerType(models.Model):
@@ -210,111 +193,6 @@ class EntityPaymentImage(Image):
         return self.entity_payment.get_name()
 
 
-class ClothManager(models.Manager):
-    @staticmethod
-    def create_cloth_from_form_data(form):
-        """Create an instance of Cloth from form data
-        :param form: Form data posted by user
-        :return: An instance of Cloth
-        """
-        cloth = Cloth()
-        cloth.serial_no = form['serial_no']
-        return cloth
-
-
-class Cloth(models.Model):
-    serial_no = models.CharField(max_length=20)
-    cloth_name = models.CharField(max_length=20, blank=True)
-    width = models.IntegerField(default=150, blank=True)
-    used_for = models.CharField(max_length=100, blank=True)
-    grams_per_m2 = models.FloatField(blank=True)
-    description = models.TextField(max_length=1000, blank=True)
-    added_time = models.DateTimeField(auto_now_add=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.serial_no + '_' + self.cloth_name
-
-    def get_name(self):
-        return self.__str__()
-
-
-class ClothImage(Image):
-    """
-    Show the detail of the cloth or the color card of the cloth.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.cloth.get_name()
-
-
-class ClothCategory(models.Model):
-    """
-    Indicate the general category of cloth, such as if it's plain color,
-    """
-    category_name = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.category_name
-
-
-class CategoryOfCloth(models.Model):
-    """
-    Indicate what category the cloth belongs to.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    category = models.ForeignKey(ClothCategory, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-
-class ClothTexture(models.Model):
-    """
-    The texture of the cloth.
-    """
-    texture_name = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.texture_name
-
-
-class TextureOfCloth(models.Model):
-    """
-    Indicate what texture the cloth is formed.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    category = models.ForeignKey(ClothTexture, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-
-class ClothMaterial(models.Model):
-    """
-    The material of the cloth.
-    """
-    material_name = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.material_name
-
-
-class MaterialOfCloth(models.Model):
-    """
-    Indicate what material the cloth is made by.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    category = models.ForeignKey(ClothMaterial, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-
 class ClothUnit(models.Model):
     """
     The unit used to measure the cloth.
@@ -351,6 +229,99 @@ class ClothUnitConversion(models.Model):
         return '{}->{}'.format(self.unit_from.unit_name, self.unit_to.unit_name)
 
 
+class CategoryOfCloth(models.Model):
+    """
+    Indicate the general category of cloth, such as if it's plain color,
+    """
+    category_name = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.category_name
+
+
+class TextureOfCloth(models.Model):
+    """
+    The texture of the cloth.
+    """
+    texture_name = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.texture_name
+
+
+class MaterialOfCloth(models.Model):
+    """
+    The material of the cloth.
+    """
+    material_name = models.CharField(max_length=20, unique=True)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.material_name
+
+
+class Cloth(models.Model):
+    serial_no = models.CharField(max_length=20)
+    cloth_name = models.CharField(max_length=20, blank=True)
+    width = models.IntegerField(default=150, blank=True)
+    used_for = models.CharField(max_length=100, blank=True)
+    grams_per_m2 = models.FloatField(blank=True)
+    description = models.TextField(max_length=1000, blank=True)
+    added_time = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.serial_no + '_' + self.cloth_name
+
+    def get_name(self):
+        return self.__str__()
+
+
+class ClothImage(Image):
+    """
+    Show the detail of the cloth or the color card of the cloth.
+    """
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.cloth.get_name()
+
+
+class ClothCategory(models.Model):
+    """
+    Indicate what category the cloth belongs to.
+    """
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+    category = models.ForeignKey(CategoryOfCloth, on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
+class ClothTexture(models.Model):
+    """
+    Indicate what texture the cloth is formed.
+    """
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+    category = models.ForeignKey(TextureOfCloth, on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
+class ClothMaterial(models.Model):
+    """
+    Indicate what material the cloth is made by.
+    """
+    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
+    category = models.ForeignKey(MaterialOfCloth, on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
 class ClothInShop(models.Model):
     """
     Indicates which shop has which cloth or which cloth can be found in which shop
@@ -377,18 +348,18 @@ class ClothInShopColor(models.Model):
     """
     The color of the cloth which belongs to a certain shop.
     """
-    cloth = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
+    cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
     color_id = models.CharField(max_length=20)
     color_name = models.CharField(max_length=20, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cloth.get_name()
+        return self.cloth_in_shop.get_name()
 
 
 class ClothInShopImage(Image):
     """
-    Mainly used to save the color card of the cloth which provided by a certain shop
+    Typically used to save the color card of the cloth which is provided by a certain shop
     """
     cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
 
@@ -396,13 +367,42 @@ class ClothInShopImage(Image):
         return self.cloth_in_shop.get_name()
 
 
-class ColorMap(models.Model):
+class ClothColorMap(models.Model):
     """
     Used for mapping two vendor's color for the same cloth
     """
-    cloth_internal = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
-    cloth_external = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
+    cloth_internal = models.ForeignKey(ClothInShopColor, on_delete=models.CASCADE)
+    cloth_external = models.ForeignKey(ClothInShopColor, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.cloth_in_shop.get_name()
+
+
+class EntityManager(models.Manager):
+    """
+    Manage BusinessEntity related models.
+    """
+
+    @staticmethod
+    def create_entity_from_form_data(form):
+        """
+        Create an instance of Entity from form data
+        :param form: Form data posted by user
+        :return: An instance of Entity
+        """
+        entity = BusinessEntity()
+        entity.entity_name = form['entity_name']
+        return entity
+
+
+class ClothManager(models.Manager):
+    @staticmethod
+    def create_cloth_from_form_data(form):
+        """Create an instance of Cloth from form data
+        :param form: Form data posted by user
+        :return: An instance of Cloth
+        """
+        cloth = Cloth()
+        cloth.serial_no = form['serial_no']
+        return cloth
