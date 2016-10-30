@@ -4,7 +4,9 @@ from asset.models import Cloth
 
 
 class RollOfCloth(models.Model):
-    """Describe the property of a roll of cloth, such as color, length etc."""
+    """
+    Describe the property of a roll of cloth, such as color, length etc.
+    """
 
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
     color_id = models.CharField(max_length=20)
