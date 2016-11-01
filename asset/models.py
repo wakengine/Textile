@@ -28,7 +28,7 @@ class PartnerType(models.Model):
         return self.type
 
 
-class ContactWayData(models.Model):
+class ContactInfoData(models.Model):
     """
     Indicate how to contact a person or a company.
     """
@@ -78,7 +78,7 @@ class BusinessEntity(models.Model):
         return self.__str__()
 
 
-class EntityRoleMap(models.Model):
+class EntityRole(models.Model):
     """
     Indicate a relationship with a business entity, a business entity alone may be a customer or supplier.
     """
@@ -100,13 +100,13 @@ class EntityImage(Image):
         return self.entity.get_name()
 
 
-class EntityContactWay(models.Model):
+class EntityContactMethod(models.Model):
     """
     Indicate how to contact with a business entity directly instead of via its employee.
     This is generally used for saving a company's address
     """
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
-    contact_way = models.ForeignKey(ContactWayData, on_delete=models.CASCADE)
+    contact_method = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -127,12 +127,12 @@ class BusinessContact(models.Model):
         return '{}@{}'.format(self.contact_name, self.entity.get_name())
 
 
-class BusinessContactWay(models.Model):
+class BusinessContactMethod(models.Model):
     """
     Indicate how to contact with a person who belongs to a specific business entity.
     """
     contact = models.ForeignKey(BusinessContact, on_delete=models.CASCADE)
-    contact_way = models.ForeignKey(ContactWayData, on_delete=models.CASCADE)
+    contact_method = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -154,6 +154,9 @@ class PaymentAccountType(models.Model):
 
 
 class PaymentAccountData(models.Model):
+    """
+    The detailed payment account info.
+    """
     owner_name = models.CharField(max_length=20)
     org_name = models.CharField(max_length=20)
     account_number = models.CharField(max_length=20)
@@ -165,12 +168,18 @@ class PaymentAccountData(models.Model):
 
 
 class PaymentAccount(models.Model):
+    """
+    A complete payment account info
+    """
     account_type = models.ForeignKey(PaymentAccountType, on_delete=models.PROTECT)
     account_data = models.ForeignKey(PaymentAccountData, on_delete=models.PROTECT)
     timestamp = models.DateTimeField(auto_now=True)
 
 
 class EntityPayment(models.Model):
+    """
+    Indicate how to pay to an entity
+    """
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
     account = models.ForeignKey(PaymentAccount, on_delete=models.PROTECT)
     description = models.TextField(max_length=1000, blank=True)
@@ -193,7 +202,7 @@ class EntityPaymentImage(Image):
         return self.entity_payment.get_name()
 
 
-class ClothUnit(models.Model):
+class UnitOfCloth(models.Model):
     """
     The unit used to measure the cloth.
     """
@@ -215,12 +224,12 @@ class ClothUnit(models.Model):
         return self.__str__()
 
 
-class ClothUnitConversion(models.Model):
+class UnitOfClothConversion(models.Model):
     """
     How one unit converted to another unit.
     """
-    unit_from = models.ForeignKey(ClothUnit, on_delete=models.CASCADE)
-    unit_to = models.ForeignKey(ClothUnit, on_delete=models.CASCADE)
+    unit_from = models.ForeignKey(UnitOfCloth, on_delete=models.CASCADE)
+    unit_to = models.ForeignKey(UnitOfCloth, on_delete=models.CASCADE)
     formula = models.FloatField()
     description = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now=True)
@@ -266,7 +275,7 @@ class MaterialOfCloth(models.Model):
 
 
 class Cloth(models.Model):
-    serial_no = models.CharField(max_length=20)
+    cloth_code = models.CharField(max_length=20)
     cloth_name = models.CharField(max_length=20, blank=True)
     width = models.IntegerField(default=150, blank=True)
     used_for = models.CharField(max_length=100, blank=True)
@@ -276,7 +285,7 @@ class Cloth(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.serial_no + '_' + self.cloth_name
+        return self.cloth_code + '_' + self.cloth_name
 
     def get_name(self):
         return self.__str__()
@@ -307,7 +316,7 @@ class ClothTexture(models.Model):
     Indicate what texture the cloth is formed.
     """
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    category = models.ForeignKey(TextureOfCloth, on_delete=models.CASCADE)
+    texture = models.ForeignKey(TextureOfCloth, on_delete=models.CASCADE)
     description = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -317,7 +326,7 @@ class ClothMaterial(models.Model):
     Indicate what material the cloth is made by.
     """
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    category = models.ForeignKey(MaterialOfCloth, on_delete=models.CASCADE)
+    material = models.ForeignKey(MaterialOfCloth, on_delete=models.CASCADE)
     description = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -404,5 +413,5 @@ class ClothManager(models.Manager):
         :return: An instance of Cloth
         """
         cloth = Cloth()
-        cloth.serial_no = form['serial_no']
+        cloth.cloth_code = form['serial_no']
         return cloth

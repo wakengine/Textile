@@ -3,41 +3,24 @@ from django.db import models
 from asset.models import BusinessEntity, Cloth, Image
 
 
-class OrderManager(models.Manager):
-    @staticmethod
-    def create_order_from_form_data(form):
-        """Create an instance of Order from form data
-        :param form: Form data posted by user
-        :return: An instance of Order
-        """
-        order = Order()
-        order.serial_no = form['serial_no']
-        return order
-
-    def get_total_price(self):
-        total_price = 0.0
-        all_list = self.all()
-        for item in all_list:
-            total_price += item.total_price
-
-        return format(total_price, ',')
-
-
 class Order(models.Model):
     serial_no = models.CharField(max_length=20)
     internal_id = models.CharField(max_length=20)
     customer = models.ForeignKey(BusinessEntity, on_delete=models.PROTECT)
+    supplier = models.ForeignKey(BusinessEntity, on_delete=models.PROTECT)
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
-    color = models.CharField(max_length=20)
+    color_id = models.CharField(max_length=20)
+    color_name = models.CharField(max_length=20)
     price_per_unit = models.FloatField()
     total_units = models.FloatField()
-    total_rolls = models.FloatField(default=0, blank=True)
+    total_rolls = models.FloatField()
     total_price = models.FloatField()
     is_not_paid = models.BooleanField(default=False)
     is_withdrawn = models.BooleanField(default=False)
     is_warehouse = models.BooleanField(default=False)
     description = models.TextField(max_length=1000, blank=True)
     order_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False)
+    deleted_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False)
     timestamp = models.DateTimeField(auto_now=True)
 
     objects = OrderManager()
@@ -67,3 +50,23 @@ class OrderImage(Image):
 
     def __str__(self):
         return self.order.get_name()
+
+
+class OrderManager(models.Manager):
+    @staticmethod
+    def create_order_from_form_data(form):
+        """Create an instance of Order from form data
+        :param form: Form data posted by user
+        :return: An instance of Order
+        """
+        order = Order()
+        order.serial_no = form['serial_no']
+        return order
+
+    def get_total_price(self):
+        total_price = 0.0
+        all_list = self.all()
+        for item in all_list:
+            total_price += item.total_price
+
+        return format(total_price, ',')

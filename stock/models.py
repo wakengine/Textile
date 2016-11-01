@@ -25,18 +25,6 @@ class RollOfCloth(models.Model):
         self.item_id = self.color_id
 
 
-class StockManager(models.Manager):
-    @staticmethod
-    def create_inventory_from_form_data(form):
-        """Create an instance of Inventory from form data
-        :param form: Form data posted by user
-        :return: An instance of Inventory
-        """
-        inventory = Inventory()
-        inventory.roll_of_cloth = RollOfCloth()
-        return inventory
-
-
 class Warehouse(models.Model):
     name = models.CharField(max_length=20)
     address = models.CharField(max_length=100)
@@ -73,3 +61,15 @@ class PieceOfCloth(models.Model):
 
     def __str__(self):
         return self.belong_to.cloth.get_name()
+
+
+class StockManager(models.Manager):
+    @staticmethod
+    def create_inventory_from_form_data(form):
+        """Create an instance of Inventory from form data
+        :param form: Form data posted by user
+        :return: An instance of Inventory
+        """
+        inventory = Inventory()
+        inventory.roll_of_cloth = RollOfCloth()
+        return inventory
