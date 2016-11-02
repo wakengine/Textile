@@ -1,4 +1,4 @@
-from utils.form_utils import *
+from .form_utils import *
 
 
 class EntityForm(forms.Form):
@@ -72,5 +72,13 @@ class ClothForm(forms.Form):
     name = forms.CharField(
         label='名称',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '名称'}),
+        max_length=20,
+    )
+
+
+class OrderForm(forms.Form):
+    serial_no = forms.CharField(
+        label='单号',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '单号'}),
         max_length=20,
     )
