@@ -1,6 +1,35 @@
 from django.db import models
 
 
+class EntityManager(models.Manager):
+    """
+    Manage BusinessEntity related models.
+    """
+
+    @staticmethod
+    def create_entity_from_form_data(form):
+        """
+        Create an instance of Entity from form data
+        :param form: Form data posted by user
+        :return: An instance of Entity
+        """
+        entity = BusinessEntity()
+        entity.entity_name = form['entity_name']
+        return entity
+
+
+class ClothManager(models.Manager):
+    @staticmethod
+    def create_cloth_from_form_data(form):
+        """Create an instance of Cloth from form data
+        :param form: Form data posted by user
+        :return: An instance of Cloth
+        """
+        cloth = Cloth()
+        cloth.cloth_code = form['serial_no']
+        return cloth
+
+
 class Image(models.Model):
     """
     Base image class, may be used by any model.
@@ -63,7 +92,7 @@ class ContactInfoData(models.Model):
 class BusinessEntity(models.Model):
     """
     The business entity is always the one we should work with. It may have its owner or employee,
-    but we it's the entity we should make an order belong to.
+    but we it's the entity we should make an operation belong to.
     """
     entity_name = models.CharField(max_length=20)
     description = models.TextField(max_length=1000, blank=True)
@@ -228,8 +257,8 @@ class UnitOfClothConversion(models.Model):
     """
     How one unit converted to another unit.
     """
-    unit_from = models.ForeignKey(UnitOfCloth, on_delete=models.CASCADE)
-    unit_to = models.ForeignKey(UnitOfCloth, on_delete=models.CASCADE)
+    unit_from = models.ForeignKey(UnitOfCloth, related_name='unit_from', on_delete=models.CASCADE)
+    unit_to = models.ForeignKey(UnitOfCloth, related_name='unit_to', on_delete=models.CASCADE)
     formula = models.FloatField()
     description = models.CharField(max_length=100)
     timestamp = models.DateTimeField(auto_now=True)
@@ -380,38 +409,9 @@ class ClothColorMap(models.Model):
     """
     Used for mapping two vendor's color for the same cloth
     """
-    cloth_internal = models.ForeignKey(ClothInShopColor, on_delete=models.CASCADE)
-    cloth_external = models.ForeignKey(ClothInShopColor, on_delete=models.CASCADE)
+    cloth_internal = models.ForeignKey(ClothInShopColor, related_name='internal', on_delete=models.CASCADE)
+    cloth_external = models.ForeignKey(ClothInShopColor, related_name='external', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.cloth_in_shop.get_name()
-
-
-class EntityManager(models.Manager):
-    """
-    Manage BusinessEntity related models.
-    """
-
-    @staticmethod
-    def create_entity_from_form_data(form):
-        """
-        Create an instance of Entity from form data
-        :param form: Form data posted by user
-        :return: An instance of Entity
-        """
-        entity = BusinessEntity()
-        entity.entity_name = form['entity_name']
-        return entity
-
-
-class ClothManager(models.Manager):
-    @staticmethod
-    def create_cloth_from_form_data(form):
-        """Create an instance of Cloth from form data
-        :param form: Form data posted by user
-        :return: An instance of Cloth
-        """
-        cloth = Cloth()
-        cloth.cloth_code = form['serial_no']
-        return cloth

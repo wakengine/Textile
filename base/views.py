@@ -7,7 +7,7 @@ from .models import EntityManager, ClothManager
 
 
 class AddEntity(View):
-    template_name = 'asset/entity_add.html'
+    template_name = 'base/entity_add.html'
 
     def get(self, request):
         form = EntityForm()
@@ -23,7 +23,7 @@ class AddEntity(View):
 
 
 class AddCloth(View):
-    template_name = 'asset/cloth_add.html'
+    template_name = 'base/cloth_add.html'
 
     def get(self, request):
         form = ClothForm()

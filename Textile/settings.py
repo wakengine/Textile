@@ -36,9 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'asset.apps.AssetConfig',
-    'order.apps.SalesConfig',
-    'stock.apps.StockConfig',
+    'base.apps.AssetConfig',
+    'operation.apps.SalesConfig',
     'report.apps.ReportConfig'
 ]
 

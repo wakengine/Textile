@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, Http404
 from django.views import View
 
-from order.forms import OrderForm
+from operation.forms import OrderForm
 from .models import Order, OrderManager
 
 
 class ShowOrders(View):
-    template_name = 'order/order_list.html'
+    template_name = 'operation/order_list.html'
 
     def get(self, request):
         all_list = Order.objects.all()
@@ -22,7 +22,7 @@ class ShowOrders(View):
 
 
 class CreateOrder(View):
-    template_name = 'order/order_add.html'
+    template_name = 'operation/order_add.html'
 
     def get(self, request):
         form = OrderForm()
@@ -35,4 +35,4 @@ class CreateOrder(View):
             order.save()
 
         raise Http404('TODO: Not implemented.')
-        return redirect('order:show')
+        return redirect('operation:show')
