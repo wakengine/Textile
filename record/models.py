@@ -1,4 +1,6 @@
-from .model_managers import *
+import django.db.models as models
+
+import record.model_managers as managers
 
 
 class Image(models.Model):
@@ -8,7 +10,7 @@ class Image(models.Model):
 
     image = models.FileField()
     path = models.FilePathField()
-    description = models.CharField(max_length=100, blank=True)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -21,7 +23,7 @@ class PartnerType(models.Model):
     These relationship may include such as Customer, Supplier, etc.
     """
     type = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str(self):
@@ -53,7 +55,7 @@ class ContactInfoData(models.Model):
     method = models.CharField(max_length=10, default='tel', choices=METHODS)
     category = models.CharField(max_length=10, default='personal', choices=CATEGORY)
     content = models.CharField(max_length=100)
-    description = models.TextField(max_length=1000, blank=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str(self):
@@ -65,11 +67,11 @@ class BusinessEntity(models.Model):
     The business entity is always the one we should work with. It may have its owner or employee,
     but we it's the entity we should make an operation belong to.
     """
-    entity_name = models.CharField(max_length=20)
-    description = models.TextField(max_length=1000, blank=True)
+    entity_name = models.CharField(max_length=100)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = EntityManager()
+    objects = managers.EntityManager()
 
     def __str__(self):
         return self.entity_name
@@ -82,8 +84,8 @@ class EntityRole(models.Model):
     """
     Indicate a relationship with a business entity, a business entity alone may be a customer or supplier.
     """
-    entity = models.ForeignKey(BusinessEntity, on_delete=models.PROTECT)
-    role = models.ForeignKey(PartnerType, on_delete=models.PROTECT)
+    entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
+    role = models.ForeignKey(PartnerType, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -100,13 +102,13 @@ class EntityImage(Image):
         return self.entity.get_name()
 
 
-class EntityContactMethod(models.Model):
+class EntityContactInfo(models.Model):
     """
     Indicate how to contact with a business entity directly instead of via its employee.
     This is generally used for saving a company's address
     """
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
-    contact_method = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
+    contact_info = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -117,22 +119,22 @@ class BusinessContact(models.Model):
     """
     A BusinessContact is either an employee or the entity's owner, it's a human being.
     """
-    contact_name = models.CharField(max_length=10, blank=True)
+    contact_name = models.CharField(max_length=100)
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
-    position = models.CharField(max_length=10, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
+    position = models.CharField(max_length=20, blank=True, null=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return '{}@{}'.format(self.contact_name, self.entity.get_name())
 
 
-class BusinessContactMethod(models.Model):
+class BusinessContactInfo(models.Model):
     """
     Indicate how to contact with a person who belongs to a specific business entity.
     """
     contact = models.ForeignKey(BusinessContact, on_delete=models.CASCADE)
-    contact_method = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
+    contact_info = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -149,7 +151,7 @@ class PaymentAccountType(models.Model):
     """
 
     type = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -157,10 +159,10 @@ class PaymentAccountData(models.Model):
     """
     The detailed payment account info.
     """
-    owner_name = models.CharField(max_length=20)
-    org_name = models.CharField(max_length=20)
-    account_number = models.CharField(max_length=20)
-    description = models.CharField(max_length=100)
+    owner_name = models.CharField(max_length=100)
+    org_name = models.CharField(max_length=100)
+    account_number = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -171,8 +173,8 @@ class PaymentAccount(models.Model):
     """
     A complete payment account info
     """
-    account_type = models.ForeignKey(PaymentAccountType, on_delete=models.PROTECT)
-    account_data = models.ForeignKey(PaymentAccountData, on_delete=models.PROTECT)
+    account_type = models.ForeignKey(PaymentAccountType, on_delete=models.CASCADE)
+    account_data = models.ForeignKey(PaymentAccountData, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -181,8 +183,8 @@ class EntityPayment(models.Model):
     Indicate how to pay to an entity
     """
     entity = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
-    account = models.ForeignKey(PaymentAccount, on_delete=models.PROTECT)
-    description = models.TextField(max_length=1000, blank=True)
+    account = models.ForeignKey(PaymentAccount, on_delete=models.CASCADE)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -214,7 +216,7 @@ class UnitOfCloth(models.Model):
     )
 
     unit_name = models.CharField(max_length=20)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -224,26 +226,12 @@ class UnitOfCloth(models.Model):
         return self.__str__()
 
 
-class UnitOfClothConversion(models.Model):
-    """
-    How one unit converted to another unit.
-    """
-    unit_from = models.ForeignKey(UnitOfCloth, related_name='unit_from', on_delete=models.CASCADE)
-    unit_to = models.ForeignKey(UnitOfCloth, related_name='unit_to', on_delete=models.CASCADE)
-    formula = models.FloatField()
-    description = models.CharField(max_length=100)
-    timestamp = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return '{}->{}'.format(self.unit_from.unit_name, self.unit_to.unit_name)
-
-
 class CategoryOfCloth(models.Model):
     """
     Indicate the general category of cloth, such as if it's plain color,
     """
     category_name = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -255,7 +243,7 @@ class TextureOfCloth(models.Model):
     The texture of the cloth.
     """
     texture_name = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -267,7 +255,7 @@ class MaterialOfCloth(models.Model):
     The material of the cloth.
     """
     material_name = models.CharField(max_length=20, unique=True)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -276,11 +264,11 @@ class MaterialOfCloth(models.Model):
 
 class Cloth(models.Model):
     cloth_code = models.CharField(max_length=20)
-    cloth_name = models.CharField(max_length=20, blank=True)
-    width = models.IntegerField(default=150, blank=True)
-    used_for = models.CharField(max_length=100, blank=True)
-    grams_per_m2 = models.FloatField(blank=True)
-    description = models.TextField(max_length=1000, blank=True)
+    cloth_name = models.CharField(max_length=20)
+    width = models.IntegerField(default=150, blank=True, null=True)
+    used_for = models.CharField(max_length=100, blank=True, null=True)
+    grams_per_m2 = models.FloatField(blank=True, null=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     added_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -307,7 +295,7 @@ class ClothCategory(models.Model):
     """
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
     category = models.ForeignKey(CategoryOfCloth, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -317,7 +305,7 @@ class ClothTexture(models.Model):
     """
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
     texture = models.ForeignKey(TextureOfCloth, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -327,7 +315,7 @@ class ClothMaterial(models.Model):
     """
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
     material = models.ForeignKey(MaterialOfCloth, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
 
@@ -338,11 +326,11 @@ class ClothInShop(models.Model):
     """
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
     shop = models.ForeignKey(BusinessEntity, on_delete=models.CASCADE)
-    shop_code = models.CharField(max_length=10, blank=True)
-    num_of_colors = models.IntegerField(default=0, blank=True)
-    price = models.FloatField(default=0, blank=True)
-    price_detail = models.CharField(max_length=100, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
+    shop_code = models.CharField(max_length=10, blank=True, null=True)
+    num_of_colors = models.IntegerField(blank=True, null=True)
+    price = models.FloatField(blank=True, null=True)
+    price_detail = models.CharField(max_length=100, blank=True, null=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     added_time = models.DateField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -359,7 +347,7 @@ class ClothInShopColor(models.Model):
     """
     cloth_in_shop = models.ForeignKey(ClothInShop, on_delete=models.CASCADE)
     color_id = models.CharField(max_length=20)
-    color_name = models.CharField(max_length=20, blank=True)
+    color_name = models.CharField(max_length=20, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -395,11 +383,11 @@ class RollOfCloth(models.Model):
 
     cloth = models.ForeignKey(Cloth, on_delete=models.PROTECT)
     color_id = models.CharField(max_length=20)
-    color_name = models.CharField(max_length=20, blank=True)
+    color_name = models.CharField(max_length=20)
     item_id = models.CharField(max_length=20, unique=True)
-    batch_id = models.CharField(max_length=20, blank=True)
+    batch_id = models.CharField(max_length=20, blank=True, null=True)
     meter = models.FloatField()
-    description = models.TextField(max_length=1000, blank=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -412,25 +400,29 @@ class RollOfCloth(models.Model):
 
 class Warehouse(models.Model):
     name = models.CharField(max_length=20)
-    address = models.CharField(max_length=100)
-    contact = models.CharField(max_length=20, blank=True)
-    telephone = models.CharField(max_length=20, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
+    person_in_charge = models.CharField(max_length=20)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
 
+class WarehouseContactInfo(models.Model):
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+    contact_info = models.ForeignKey(ContactInfoData, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now=True)
+
+
 class Inventory(models.Model):
     roll_of_cloth = models.ForeignKey(RollOfCloth, on_delete=models.PROTECT)
     warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT)
     stock_in_date = models.DateField(auto_now_add=False)
-    stock_out_date = models.DateField(auto_now_add=False, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
+    stock_out_date = models.DateField(auto_now_add=False, blank=True, null=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = StockManager()
+    objects = managers.StockManager()
 
     def __str__(self):
         return self.cloth.get_name()
@@ -439,9 +431,9 @@ class Inventory(models.Model):
 class PieceOfCloth(models.Model):
     belong_to = models.ForeignKey(Inventory, on_delete=models.CASCADE)
     sale_meter = models.FloatField()
-    manual_adjust = models.FloatField(default=0.0, blank=True)
-    description = models.TextField(max_length=1000, blank=True)
+    manual_adjust = models.FloatField(blank=True, null=True)
     order_date = models.DateField(auto_now_add=False)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -463,12 +455,13 @@ class Order(models.Model):
     is_not_paid = models.BooleanField(default=False)
     is_withdrawn = models.BooleanField(default=False)
     is_warehouse = models.BooleanField(default=False)
-    description = models.TextField(max_length=1000, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     order_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False)
     deleted_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = OrderManager()
+    objects = managers.OrderManager()
 
     def __str__(self):
         return self.serial_no + ':' + self.customer.get_name()

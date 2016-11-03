@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -33,7 +32,8 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(blank=True, max_length=100)),
                 ('timestamp', models.DateTimeField(auto_now=True)),
                 (
-                'contact', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record.BusinessContact')),
+                    'contact',
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record.BusinessContact')),
             ],
             options={
                 'abstract': False,
@@ -45,7 +45,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('timestamp', models.DateTimeField(auto_now=True)),
                 (
-                'contact', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record.BusinessContact')),
+                    'contact',
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='record.BusinessContact')),
             ],
         ),
         migrations.CreateModel(

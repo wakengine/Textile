@@ -1,4 +1,4 @@
-from .form_utils import *
+from .form_base import *
 
 
 class EntityForm(forms.Form):
