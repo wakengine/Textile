@@ -5,8 +5,9 @@
 {% block content %}
   <div class="container-fluid">
     <h1 class="page-header" align="center"><span class="text-primary">添加布料</span></h1>
-
-    <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+    <a href="{% url 'record:cloth_list' %}" class="btn btn-info btn-block" role="button">返回布料清单</a>
+    <br>
+    <form class="form-horizontal" method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {% for field in form_fields %}
         <div class="form-group">

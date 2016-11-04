@@ -1,6 +1,71 @@
 import django.db.models as models
 
-import record.model_managers as managers
+
+class EntityManager(models.Manager):
+    """
+    Manage BusinessEntity related models.
+    """
+
+    @staticmethod
+    def create_entity_from_form_data(form):
+        """
+        Create an instance of Entity from form data
+        :param form: Form data posted by user
+        :return: An instance of Entity
+        """
+        entity = BusinessEntity()
+        entity.entity_name = form['entity_name']
+        return entity
+
+
+class ClothManager(models.Manager):
+    @staticmethod
+    def create_cloth_from_form_data(form):
+        """
+        Create an instance of Cloth from form data
+        :param form: Form data posted by user
+        :return: An instance of Cloth
+        """
+        cloth = Cloth()
+        cloth.cloth_code = form['cloth_code']
+        cloth.cloth_name = form['cloth_name']
+        if not cloth.cloth_name:
+            cloth.cloth_name = cloth.cloth_code
+        cloth.breadth = form['breadth']
+        return cloth
+
+
+class StockManager(models.Manager):
+    @staticmethod
+    def create_inventory_from_form_data(form):
+        """
+        Create an instance of Inventory from form data
+        :param form: Form data posted by user
+        :return: An instance of Inventory
+        """
+        inventory = Inventory()
+        inventory.roll_of_cloth = RollOfCloth()
+        return inventory
+
+
+class OrderManager(models.Manager):
+    @staticmethod
+    def create_order_from_form_data(form):
+        """Create an instance of Order from form data
+        :param form: Form data posted by user
+        :return: An instance of Order
+        """
+        order = Order()
+        order.serial_no = form['serial_no']
+        return order
+
+    def get_total_price(self):
+        total_price = 0.0
+        all_list = self.all()
+        for item in all_list:
+            total_price += item.total_price
+
+        return format(total_price, ',')
 
 
 class Image(models.Model):
@@ -71,7 +136,7 @@ class BusinessEntity(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = managers.EntityManager()
+    objects = EntityManager()
 
     def __str__(self):
         return self.entity_name
@@ -209,12 +274,6 @@ class UnitOfCloth(models.Model):
     The unit used to measure the cloth.
     """
 
-    SALE_UNIT = (
-        ('M', 'Meter'),
-        ('Y', 'Yard'),
-        ('KG', 'Kilogram'),
-    )
-
     unit_name = models.CharField(max_length=20)
     description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
@@ -265,7 +324,7 @@ class MaterialOfCloth(models.Model):
 class Cloth(models.Model):
     cloth_code = models.CharField(max_length=20)
     cloth_name = models.CharField(max_length=20)
-    width = models.IntegerField(default=150, blank=True, null=True)
+    breadth = models.IntegerField(default=150, blank=True, null=True)
     used_for = models.CharField(max_length=100, blank=True, null=True)
     grams_per_m2 = models.FloatField(blank=True, null=True)
     description = models.TextField(max_length=1000, blank=True, null=True)
@@ -400,7 +459,7 @@ class RollOfCloth(models.Model):
 
 class Warehouse(models.Model):
     name = models.CharField(max_length=20)
-    person_in_charge = models.CharField(max_length=20)
+    person_in_charge = models.CharField(max_length=20, blank=True, null=True)
     description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
@@ -422,7 +481,7 @@ class Inventory(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = managers.StockManager()
+    objects = StockManager()
 
     def __str__(self):
         return self.cloth.get_name()
@@ -461,7 +520,7 @@ class Order(models.Model):
     deleted_date = models.DateField(auto_now=False, auto_now_add=False, auto_created=False)
     timestamp = models.DateTimeField(auto_now=True)
 
-    objects = managers.OrderManager()
+    objects = OrderManager()
 
     def __str__(self):
         return self.serial_no + ':' + self.customer.get_name()

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %} Sales&Stock {% endblock %}
+
+{% block content %}
+  <h1 class="page-header" align="center"><span class="text-primary">布料{{ cloth.cloth_code }}更新</span></h1>
+
+  <form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input class="btn btn-info btn-block" type="submit" value="更新"/>
+    <a href="{% url 'record:cloth_list' %}" class="btn btn-primary btn-block">返回布料清单</a>
+
+  </form>
+
+{% endblock %}
