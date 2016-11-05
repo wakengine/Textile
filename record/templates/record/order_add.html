@@ -3,41 +3,25 @@
 {% block title %} 添加销售数据 {% endblock %}
 
 {% block content %}
+  <script>
+    function get_total_price(units, price) {
+      document.getElementById('id_total_price').innerHTML = '' + (units * price).toFixed(1);
+    }
+    function set_current_date(id) {
+      document.getElementById(id).value = moment().format('YYYY-MM-DD');
+    }
+  </script>
+
   <div class="container-fluid">
     <h1 class="page-header" align="center"><span class="text-primary">添加销售数据</span></h1>
 
-    <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+    <form class="form-horizontal" action="" method="post" enctype="multipart/form-data"
+          onchange="get_total_price(
+              document.getElementById('id_price_per_unit').value,
+              document.getElementById('id_total_units').value)">
       {% csrf_token %}
-      {% for field in form_fields %}
-        <div class="form-group">
-          {% if field|is_checkbox %}
-            <label class="control-label col-sm-1" style="min-width: 120px"
-                   for="{{ field.id_for_label }}"><span class="text-primary bg-info">{{ field.label }}</span></label>
-            <div class="col-sm-2" style="min-width: 240px;margin-top: 5px;">
-              {{ field }}
-            </div>
-          {% else %}
-            {% if field.field.required %}
-              <label class="control-label col-sm-1" for="{{ field.id_for_label }}" style="min-width: 120px"><span
-                  class="text-primary bg-info">{{ field.label }}</span><span
-                  class="text-danger">*</span></label>
-            {% else %}
-              <label class="control-label col-sm-1" for="{{ field.id_for_label }}" style="min-width: 120px"><span
-                  class="text-primary bg-info">{{ field.label }}</span></label>
-            {% endif %}
-
-            {% if field|is_textarea %}
-              <div class="col-sm-6" style="min-width: 360px">
-                {{ field }}
-              </div>
-            {% else %}
-              <div class="col-sm-2" style="min-width: 240px">
-                {{ field }}
-              </div>
-            {% endif %}
-          {% endif %}
-        </div>
-      {% endfor %}
+      {% include "form_base.html" %}
+      <body onload="set_current_date('id_order_date')"></body>
       <div class="form-group">
         <label class="control-label col-sm-1" style="min-width: 120px"></label>
         <div class="col-sm-2" style="min-width: 240px">

@@ -21,9 +21,9 @@
         <tr>
           <td><a href="{% url 'record:cloth_detail' cloth.pk %}">{{ cloth.cloth_code }}</a></td>
           <td><a href="{% url 'record:cloth_detail' cloth.pk %}">{{ cloth.cloth_name }}</a></td>
-          <td>{{ cloth.breadth }}</td>
-          <td>{{ cloth.used_for }}</td>
-          <td>{{ cloth.grams_per_m2 }}</td>
+          <td>{% if cloth.breadth %}{{ cloth.breadth }} {% endif %}</td>
+          <td>{% if cloth.used_for %}{{ cloth.used_for }} {% endif %}</td>
+          <td>{% if cloth.grams_per_m2 %}{{ cloth.grams_per_m2 }} {% endif %}</td>
         </tr>
       {% endfor %}
       </tbody>
