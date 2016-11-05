@@ -324,9 +324,12 @@ class MaterialOfCloth(models.Model):
 class Cloth(models.Model):
     cloth_code = models.CharField(max_length=20)
     cloth_name = models.CharField(max_length=20)
-    breadth = models.IntegerField(default=150, blank=True, null=True)
     used_for = models.CharField(max_length=100, blank=True, null=True)
-    grams_per_m2 = models.FloatField(blank=True, null=True)
+    category = models.ForeignKey(CategoryOfCloth, on_delete=models.SET_NULL, blank=True, null=True)
+    texture = models.ForeignKey(TextureOfCloth, on_delete=models.SET_NULL, blank=True, null=True)
+    material = models.ForeignKey(MaterialOfCloth, on_delete=models.SET_NULL, blank=True, null=True)
+    breadth = models.IntegerField(blank=True, null=True)
+    grams_per_m2 = models.IntegerField(blank=True, null=True)
     description = models.TextField(max_length=1000, blank=True, null=True)
     added_time = models.DateTimeField(auto_now_add=True)
     timestamp = models.DateTimeField(auto_now=True)
@@ -346,36 +349,6 @@ class ClothImage(Image):
 
     def __str__(self):
         return self.cloth.get_name()
-
-
-class ClothCategory(models.Model):
-    """
-    Indicate what category the cloth belongs to.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    category = models.ForeignKey(CategoryOfCloth, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-
-class ClothTexture(models.Model):
-    """
-    Indicate what texture the cloth is formed.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    texture = models.ForeignKey(TextureOfCloth, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now=True)
-
-
-class ClothMaterial(models.Model):
-    """
-    Indicate what material the cloth is made by.
-    """
-    cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
-    material = models.ForeignKey(MaterialOfCloth, on_delete=models.CASCADE)
-    description = models.CharField(max_length=100, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now=True)
 
 
 class ClothInShop(models.Model):

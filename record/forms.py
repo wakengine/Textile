@@ -70,16 +70,16 @@ class ClothForm(forms.Form):
         required=False,
     )
 
-    breadth = forms.IntegerField(
-        label='幅宽(cm)',
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0', 'value': '150'}),
-        required=False,
-    )
-
     used_for = forms.CharField(
         label='用途',
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '用途'}),
         max_length=100,
+        required=False,
+    )
+
+    breadth = forms.IntegerField(
+        label='幅宽(cm)',
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0', 'value': '150'}),
         required=False,
     )
 
