@@ -5,7 +5,11 @@
 {% block content %}
   <h1 class="page-header" align="center"><span class="text-primary">布料{{ cloth.cloth_code }}详情</span></h1>
 
-  <div class="btn-group btn-group-vertical">
+  {% for image in cloth.clothimage_set.all %}
+    <img src="/media/{{ image.image }}" style="max-width: 800px; max-height: 800px;">
+  {% endfor %}
+  <br><br>
+  <div class="btn-group btn-group-justified">
     <a href="{% url 'record:cloth_update' cloth.pk %}" class="btn btn-primary">更新布料信息</a>
     <a href="{% url 'record:cloth_add' %}" class="btn btn-primary">添加新布料</a>
     <a href="{% url 'record:cloth_list' %}" class="btn btn-primary">返回布料清单</a>

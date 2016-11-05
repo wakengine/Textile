@@ -1,5 +1,3 @@
-import os
-
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -7,16 +5,8 @@ from django.views import View
 from django.views.generic import DetailView
 from django.views.generic import UpdateView
 
-import Textile.settings
 from .forms import *
 from .models import *
-
-
-def handle_uploaded_file(file_src, file_dst):
-    os.makedirs(os.path.dirname(file_dst), exist_ok=True)
-    with open(file_dst, 'wb+') as dst:
-        for chunk in file_src.chunks():
-            dst.write(chunk)
 
 
 class EntityAddView(View):
@@ -55,16 +45,18 @@ class ClothAddView(View):
         form = ClothForm(request.POST, request.FILES)
         if form.is_valid():
             form = form.cleaned_data
-            image_file = request.FILES['image']
-            dst_file_name = 'images/cloth/2016.jpg'
-            handle_uploaded_file(image_file, os.path.join(Textile.settings.MEDIA_ROOT, dst_file_name))
             cloth = ClothManager.create_cloth_from_form_data(form)
             cloth.save()
-            image = ClothImage()
-            image.cloth = cloth
-            image.image = dst_file_name
-            image.save()
+
+            if 'image' in request.FILES:
+                image_file = request.FILES['image']
+                image = ClothImage()
+                image.cloth = cloth
+                image.create_image_from_form(image_file)
+                image.save()
+
             return redirect('record:cloth_list')
+
         return Http404('Invalid form data.')
 
 

@@ -1,4 +1,16 @@
+import datetime
+import os
+
 import django.db.models as models
+
+import Textile
+
+
+def handle_uploaded_file(file_src, file_dst):
+    os.makedirs(os.path.dirname(file_dst), exist_ok=True)
+    with open(file_dst, 'wb+') as dst:
+        for chunk in file_src.chunks():
+            dst.write(chunk)
 
 
 class EntityManager(models.Manager):
@@ -91,11 +103,20 @@ class Image(models.Model):
     """
     Base image class, may be used by any model.
     """
+    IMAGE_DIR = 'images/'
+
     title = models.CharField(max_length=100, blank=True, null=True)
     image = models.FileField()
-    # path = models.FilePathField()
     description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
+
+    def create_image_from_form(self, orig_file):
+        now = datetime.datetime.today()
+        dst_file_name = '{}.jpg'.format(str(now).replace(' ', '_').replace(':', '.'))
+        stored_name = '{dir}/{file}'.format(dir=self.IMAGE_DIR, file=dst_file_name)
+        dst_file = os.path.join(Textile.settings.MEDIA_ROOT, stored_name)
+        handle_uploaded_file(orig_file, dst_file)
+        self.image = stored_name
 
     class Meta:
         abstract = True
@@ -364,6 +385,8 @@ class ClothImage(Image):
     """
     Show the detail of the cloth or the color card of the cloth.
     """
+
+    IMAGE_DIR = 'images/cloth'
     cloth = models.ForeignKey(Cloth, on_delete=models.CASCADE)
 
     def __str__(self):
