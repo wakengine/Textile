@@ -29,9 +29,28 @@ class ClothManager(models.Manager):
         cloth = Cloth()
         cloth.cloth_code = form['cloth_code']
         cloth.cloth_name = form['cloth_name']
+        cloth.breadth = form['breadth']
+        cloth.grams_per_m2 = form['grams_per_m2']
+        cloth.used_for = form['used_for']
+        cloth.description = form['description']
+
+        category = form['category_name']
+        material = form['material_name']
+        texture = form['texture_name']
+
+        if category:
+            category, _ = CategoryOfCloth.objects.update_or_create(category_name=category)
+            cloth.category = category
+        if material:
+            material, _ = MaterialOfCloth.objects.update_or_create(material_name=material)
+            cloth.material = material
+        if texture:
+            texture, _ = TextureOfCloth.objects.update_or_create(texture_name=texture)
+            cloth.texture = texture
+
         if not cloth.cloth_name:
             cloth.cloth_name = cloth.cloth_code
-        cloth.breadth = form['breadth']
+
         return cloth
 
 
@@ -72,9 +91,9 @@ class Image(models.Model):
     """
     Base image class, may be used by any model.
     """
-
+    title = models.CharField(max_length=100, blank=True, null=True)
     image = models.FileField()
-    path = models.FilePathField()
+    # path = models.FilePathField()
     description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 

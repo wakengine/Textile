@@ -1,3 +1,5 @@
+import os
+
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -5,8 +7,16 @@ from django.views import View
 from django.views.generic import DetailView
 from django.views.generic import UpdateView
 
+import Textile.settings
 from .forms import *
 from .models import *
+
+
+def handle_uploaded_file(file_src, file_dst):
+    os.makedirs(os.path.dirname(file_dst), exist_ok=True)
+    with open(file_dst, 'wb+') as dst:
+        for chunk in file_src.chunks():
+            dst.write(chunk)
 
 
 class EntityAddView(View):
@@ -42,11 +52,18 @@ class ClothAddView(View):
         return render(request, self.template_name, {'form_fields': form})
 
     def post(self, request):
-        form = ClothForm(request.POST)
+        form = ClothForm(request.POST, request.FILES)
         if form.is_valid():
             form = form.cleaned_data
+            image_file = request.FILES['image']
+            dst_file_name = 'images/cloth/2016.jpg'
+            handle_uploaded_file(image_file, os.path.join(Textile.settings.MEDIA_ROOT, dst_file_name))
             cloth = ClothManager.create_cloth_from_form_data(form)
             cloth.save()
+            image = ClothImage()
+            image.cloth = cloth
+            image.image = dst_file_name
+            image.save()
             return redirect('record:cloth_list')
         return Http404('Invalid form data.')
 
@@ -74,7 +91,8 @@ class ClothDetailView(DetailView):
 class ClothUpdateView(UpdateView):
     template_name = 'record/cloth_update.html'
     model = Cloth
-    fields = ['cloth_code', 'cloth_name']
+    fields = ['cloth_code', 'cloth_name',
+              'category', 'material', 'texture', 'used_for', 'breadth', 'grams_per_m2', 'description']
     success_url = reverse_lazy('record:cloth_list')
 
 

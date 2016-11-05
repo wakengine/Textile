@@ -1,9 +1,11 @@
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.contrib import admin
 
-urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+from Textile import settings
 
-    url(r'^report/', include('report.urls')),
-    url(r'^', include('record.urls')),
-]
+urlpatterns = [
+                  url(r'^admin/', admin.site.urls),
+                  url(r'^report/', include('report.urls')),
+                  url(r'^', include('record.urls')),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -107,6 +107,12 @@ class ClothForm(forms.Form):
         required=False,
     )
 
+    image = forms.FileField(
+        label='图片',
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control', 'multiple': True}),
+        required=False,
+    )
+
     description = forms.CharField(
         label='详细信息',
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 9, 'placeholder': '添加详细信息'}),

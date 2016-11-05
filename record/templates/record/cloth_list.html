@@ -11,10 +11,12 @@
       <tr>
         <th>编号</th>
         <th>品名</th>
-        <th>幅宽</th>
+        <th>类型</th>
+        <th>材质</th>
+        <th>纹路</th>
         <th>用途</th>
+        <th>幅宽</th>
         <th>克重</th>
-        <th>日期</th>
       </tr>
       </thead>
       <tbody>
@@ -22,10 +24,12 @@
         <tr>
           <td><a href="{% url 'record:cloth_detail' cloth.pk %}">{{ cloth.cloth_code }}</a></td>
           <td><a href="{% url 'record:cloth_detail' cloth.pk %}">{{ cloth.cloth_name }}</a></td>
-          <td>{% if cloth.breadth %}{{ cloth.breadth }} {% endif %}</td>
+          <td>{% if cloth.category %}{{ cloth.category }} {% endif %}</td>
+          <td>{% if cloth.material %}{{ cloth.material }} {% endif %}</td>
+          <td>{% if cloth.texture %}{{ cloth.texture }} {% endif %}</td>
           <td>{% if cloth.used_for %}{{ cloth.used_for }} {% endif %}</td>
+          <td>{% if cloth.breadth %}{{ cloth.breadth }} {% endif %}</td>
           <td>{% if cloth.grams_per_m2 %}{{ cloth.grams_per_m2 }} {% endif %}</td>
-          <td>{{ cloth.added_time }} </td>
         </tr>
       {% endfor %}
       </tbody>
