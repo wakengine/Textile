@@ -5,7 +5,37 @@
 {% block content %}
   <h1 class="page-header" align="center"><span class="text-primary">布料{{ cloth.cloth_code }}详情</span></h1>
 
-  <p>编号: {{ cloth.cloth_code }}</p>
+  <table class="table table-striped table-hover">
+    <thead>
+    <tr>
+      <th>编号</th>
+      <th>品名</th>
+      <th>类型</th>
+      <th>材质</th>
+      <th>纹路</th>
+      <th>用途</th>
+      <th>幅宽</th>
+      <th>克重</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>{{ cloth.cloth_code }}</td>
+      <td>{{ cloth.cloth_name }}</td>
+      <td>{% if cloth.category %}{{ cloth.category }} {% endif %}</td>
+      <td>{% if cloth.material %}{{ cloth.material }} {% endif %}</td>
+      <td>{% if cloth.texture %}{{ cloth.texture }} {% endif %}</td>
+      <td>{% if cloth.used_for %}{{ cloth.used_for }} {% endif %}</td>
+      <td>{% if cloth.breadth %}{{ cloth.breadth }} {% endif %}</td>
+      <td>{% if cloth.grams_per_m2 %}{{ cloth.grams_per_m2 }} {% endif %}</td>
+    </tr>
+    </tbody>
+  </table>
+
+  {% if cloth.description %}
+    <p>详细描述:</p>
+    <pre>{{ cloth.description }}</pre>
+  {% endif %}
 
   {% for image in cloth.clothimage_set.all %}
     <img src="/media/{{ image.image }}" style="max-width: 800px; max-height: 800px;">
