@@ -1,6 +1,7 @@
 import datetime
 import os
 
+import PIL.Image
 import django.db.models as models
 
 import Textile
@@ -112,16 +113,25 @@ class Image(models.Model):
 
     title = models.CharField(max_length=100, blank=True, null=True)
     image = models.FileField()
+    thumbnail = models.FileField()
     description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def create_image_from_form(self, orig_file):
-        now = datetime.datetime.today()
-        dst_file_name = '{}.jpg'.format(str(now).replace(' ', '_').replace(':', '.'))
-        stored_name = '{dir}/{file}'.format(dir=self.IMAGE_DIR, file=dst_file_name)
-        dst_file = os.path.join(Textile.settings.MEDIA_ROOT, stored_name)
+        base_name = str(datetime.datetime.today()).replace(' ', '_').replace(':', '.')
+        dst_stored_name = '{dir}/{file}'.format(dir=self.IMAGE_DIR, file=base_name + '.jpg')
+        dst_file = os.path.join(Textile.settings.MEDIA_ROOT, dst_stored_name)
         handle_uploaded_file(orig_file, dst_file)
-        self.image = stored_name
+
+        thumbnail_stored_name = '{dir}/{file}'.format(dir=self.IMAGE_DIR, file=base_name + '.thumbnail.jpg')
+        thumbnail_file = os.path.join(Textile.settings.MEDIA_ROOT, thumbnail_stored_name)
+        size = 256, 256
+        im = PIL.Image.open(dst_file)
+        im.thumbnail(size)
+        im.save(thumbnail_file, 'JPEG')
+
+        self.image = dst_stored_name
+        self.thumbnail = thumbnail_stored_name
 
     class Meta:
         abstract = True

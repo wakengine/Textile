@@ -38,7 +38,9 @@
   {% endif %}
 
   {% for image in cloth.clothimage_set.all %}
-    <img src="/media/{{ image.image }}" style="max-width: 800px; max-height: 800px;">
+    <a href="/media/{{ image.image }}">
+      <img src="/media/{{ image.thumbnail }}">
+    </a>
   {% endfor %}
   <br><br>
   <div class="btn-group btn-group-justified">
