@@ -32,13 +32,18 @@ class EntityManager(models.Manager):
 
 class ClothManager(models.Manager):
     @staticmethod
-    def create_cloth_from_form_data(form):
+    def create_cloth_from_form_data(form, pk=-1):
         """
         Create an instance of Cloth from form data
         :param form: Form data posted by user
+        :param pk: Primary key of the cloth
         :return: An instance of Cloth
         """
-        cloth = Cloth()
+        if pk == -1:
+            cloth = Cloth()
+        else:
+            cloth = Cloth.objects.filter(pk=pk).first()
+
         cloth.cloth_code = form['cloth_code']
         cloth.cloth_name = form['cloth_name']
         cloth.breadth = form['breadth']
