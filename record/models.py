@@ -7,13 +7,6 @@ import django.db.models as models
 import Textile
 
 
-def handle_uploaded_file(file_src, file_dst):
-    os.makedirs(os.path.dirname(file_dst), exist_ok=True)
-    with open(file_dst, 'wb+') as dst:
-        for chunk in file_src.chunks():
-            dst.write(chunk)
-
-
 class EntityManager(models.Manager):
     """
     Manage BusinessEntity related models.
@@ -117,24 +110,34 @@ class Image(models.Model):
     description = models.CharField(max_length=100, blank=True, null=True)
     timestamp = models.DateTimeField(auto_now=True)
 
-    def create_image_from_form(self, orig_file):
-        base_name = str(datetime.datetime.today()).replace(' ', '_').replace(':', '.')
-        dst_stored_name = '{dir}/{file}'.format(dir=self.IMAGE_DIR, file=base_name + '.jpg')
-        dst_file = os.path.join(Textile.settings.MEDIA_ROOT, dst_stored_name)
-        handle_uploaded_file(orig_file, dst_file)
-
-        thumbnail_stored_name = '{dir}/{file}'.format(dir=self.IMAGE_DIR, file=base_name + '.thumbnail.jpg')
-        thumbnail_file = os.path.join(Textile.settings.MEDIA_ROOT, thumbnail_stored_name)
-        size = 256, 256
-        im = PIL.Image.open(dst_file)
-        im.thumbnail(size)
-        im.save(thumbnail_file, 'JPEG')
-
-        self.image = dst_stored_name
-        self.thumbnail = thumbnail_stored_name
-
     class Meta:
         abstract = True
+
+    def create_image_from_form(self, src_file):
+        base_name = str(datetime.datetime.today()).replace(' ', '_').replace(':', '-')
+        img_main = '{}/{}.jpg'.format(self.IMAGE_DIR, base_name)
+        img_thumbnail = '{}/{}.thumb.jpg'.format(self.IMAGE_DIR, base_name)
+
+        main_file = os.path.join(Textile.settings.MEDIA_ROOT, img_main)
+        os.makedirs(os.path.dirname(main_file), exist_ok=True)
+        with open(main_file, 'wb+') as dst:
+            for chunk in src_file.chunks():
+                dst.write(chunk)
+
+        try:
+            f = open(main_file)
+            img = PIL.Image.open(f)
+            size = 256, 256
+            img.thumbnail(size)
+            img.save(os.path.join(Textile.settings.MEDIA_ROOT, img_thumbnail), 'JPEG')
+            f.close()
+        except IOError:
+            f.close()
+            os.remove(main_file)
+            raise TypeError('Not valid image')
+
+        self.image = img_main
+        self.thumbnail = img_thumbnail
 
 
 class PartnerType(models.Model):
