@@ -1,7 +1,7 @@
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import DetailView
 
 from .forms import *
 from .models import *
@@ -47,10 +47,9 @@ class ClothAddView(View):
             cloth.save()
 
             if 'image' in request.FILES:
-                image_file = request.FILES['image']
                 image = ClothImage()
                 image.cloth = cloth
-                image.create_image_from_form(image_file)
+                image.create_image_from_form(request.FILES['image'], settings.MEDIA_ROOT)
                 image.save()
 
             return redirect('record:cloth_detail', cloth.pk)
@@ -69,13 +68,22 @@ class ClothListView(View):
         return render(request, self.template_name, context)
 
 
-class ClothDetailView(DetailView):
-    model = Cloth
+class ClothDetailView(View):
     template_name = 'record/cloth_detail.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(ClothDetailView, self).get_context_data(**kwargs)
-        return context
+    def get(self, request, pk):
+        cloth = Cloth.objects.get(pk=pk)
+        return render(request, self.template_name, {'cloth': cloth})
+
+    def post(self, request, pk):
+        image_field = 'image'
+        if image_field in request.FILES:
+            image_file = request.FILES[image_field]
+            image = ClothImage()
+            image.cloth = Cloth.objects.filter(pk=pk).first()
+            image.create_image_from_form(image_file, settings.MEDIA_ROOT)
+            image.save()
+        return redirect('record:cloth_detail', pk)
 
 
 class ClothUpdateView(View):
@@ -93,11 +101,12 @@ class ClothUpdateView(View):
             cloth = ClothManager.create_cloth_from_form_data(form, pk)
             cloth.save()
 
-            if 'image' in request.FILES:
-                image_file = request.FILES['image']
+            image_field = 'image'
+            if image_field in request.FILES:
+                image_file = request.FILES[image_field]
                 image = ClothImage()
                 image.cloth = cloth
-                image.create_image_from_form(image_file)
+                image.create_image_from_form(image_file, settings.MEDIA_ROOT)
                 image.save()
 
             return redirect('record:cloth_detail', pk)

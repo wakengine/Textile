@@ -42,7 +42,15 @@
       <img src="/media/{{ image.thumbnail }}">
     </a>
   {% endfor %}
-  <br><br>
+  <br>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="image"><br>
+    <button type="submit" class="btn btn-info">添加图片</button>
+  </form>
+
+  <br>
   <div class="btn-group btn-group-justified">
     <a href="{% url 'record:cloth_update' cloth.pk %}" class="btn btn-primary">更新布料信息</a>
     <a href="{% url 'record:cloth_add' %}" class="btn btn-primary">添加新布料</a>

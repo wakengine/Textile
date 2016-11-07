@@ -1,10 +1,8 @@
 import datetime
 import os
 
-import PIL.Image
-import django.db.models as models
-
-import Textile
+from PIL import Image
+from django.db import models
 
 
 class EntityManager(models.Manager):
@@ -98,7 +96,7 @@ class OrderManager(models.Manager):
         return format(total_price, ',')
 
 
-class Image(models.Model):
+class ImageBase(models.Model):
     """
     Base image class, may be used by any model.
     """
@@ -113,28 +111,28 @@ class Image(models.Model):
     class Meta:
         abstract = True
 
-    def create_image_from_form(self, src_file):
+    def create_image_from_form(self, src_file, abs_dir):
         base_name = str(datetime.datetime.today()).replace(' ', '_').replace(':', '-')
         img_main = '{}/{}.jpg'.format(self.IMAGE_DIR, base_name)
         img_thumbnail = '{}/{}.thumb.jpg'.format(self.IMAGE_DIR, base_name)
 
-        main_file = os.path.join(Textile.settings.MEDIA_ROOT, img_main)
+        main_file = os.path.join(abs_dir, img_main)
         os.makedirs(os.path.dirname(main_file), exist_ok=True)
         with open(main_file, 'wb+') as dst:
             for chunk in src_file.chunks():
                 dst.write(chunk)
 
         try:
-            f = open(main_file)
-            img = PIL.Image.open(f)
+            f = open(main_file, 'rb')
+            img = Image.open(f)
             size = 256, 256
             img.thumbnail(size)
-            img.save(os.path.join(Textile.settings.MEDIA_ROOT, img_thumbnail), 'JPEG')
+            img.save(os.path.join(abs_dir, img_thumbnail), 'JPEG')
             f.close()
         except IOError:
             f.close()
             os.remove(main_file)
-            raise TypeError('Not valid image')
+            raise TypeError('Not a valid image')
 
         self.image = img_main
         self.thumbnail = img_thumbnail
@@ -215,7 +213,7 @@ class EntityRole(models.Model):
         return self.entity.get_name()
 
 
-class EntityImage(Image):
+class EntityImage(ImageBase):
     """
     Use to save general images related to a specific business entity.
     """
@@ -261,7 +259,7 @@ class BusinessContactInfo(models.Model):
     timestamp = models.DateTimeField(auto_now=True)
 
 
-class BusinessContactImage(Image):
+class BusinessContactImage(ImageBase):
     """
     It can be used to save business cards.
     """
@@ -317,7 +315,7 @@ class EntityPayment(models.Model):
         return self.__str__()
 
 
-class EntityPaymentImage(Image):
+class EntityPaymentImage(ImageBase):
     """
     This can be used for saving bank card images if no time to provide detail data in PaymentAccount
     """
@@ -399,7 +397,7 @@ class Cloth(models.Model):
         return self.__str__()
 
 
-class ClothImage(Image):
+class ClothImage(ImageBase):
     """
     Show the detail of the cloth or the color card of the cloth.
     """
@@ -446,7 +444,7 @@ class ClothInShopColor(models.Model):
         return self.cloth_in_shop.get_name()
 
 
-class ClothInShopImage(Image):
+class ClothInShopImage(ImageBase):
     """
     Typically used to save the color card of the cloth which is provided by a certain shop
     """
@@ -575,7 +573,7 @@ class OrderDetail(models.Model):
         return self.order.__str__()
 
 
-class OrderImage(Image):
+class OrderImage(ImageBase):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     def __str__(self):
