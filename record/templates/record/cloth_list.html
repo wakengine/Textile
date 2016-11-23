@@ -4,7 +4,7 @@
 
 {% block content %}
   <h1 class="page-header" align="center"><span class="text-primary">布料清单</span></h1>
-  <a href="{% url 'record:cloth_add' %}" class="btn btn-info btn-block" role="button">添加新布料</a>
+  <a href="{% url 'record:cloth_add' %}" class="btn btn-info btn-block">添加新布料</a>
   <div class="table-responsive">
     <table class="table table-striped table-hover">
       <thead>
@@ -17,6 +17,7 @@
         <th>用途</th>
         <th>幅宽</th>
         <th>克重</th>
+        <th>图片</th>
       </tr>
       </thead>
       <tbody>
@@ -30,10 +31,16 @@
           <td>{% if cloth.used_for %}{{ cloth.used_for }} {% endif %}</td>
           <td>{% if cloth.breadth %}{{ cloth.breadth }} {% endif %}</td>
           <td>{% if cloth.grams_per_m2 %}{{ cloth.grams_per_m2 }} {% endif %}</td>
+          <th>{% if cloth.clothimage_set.first %}
+            <a href="/media/{{ cloth.clothimage_set.first.image }}">
+              <img src="/media/{{ cloth.clothimage_set.first.thumbnail }}" style="width:18px;height:18px;">
+            </a>
+          {% else %}无{% endif %}
+          </th>
         </tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
-  <a href="{% url 'record:cloth_add' %}" class="btn btn-info btn-block" role="button">添加新布料</a>
+  <a href="{% url 'record:cloth_add' %}" class="btn btn-info btn-block">添加新布料</a>
 {% endblock %}
